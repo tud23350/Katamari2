@@ -8,6 +8,7 @@ import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
+import com.jme3.shadow.PssmShadowRenderer;
 
 /**
  *
@@ -15,15 +16,24 @@ import com.jme3.scene.shape.Box;
  * @author Mike Jake and Dave
  */
 public class Main extends SimpleApplication {
-
+    
+    
+    //lightings and physics
+    BulletAppState bulletAppState;
+    PssmShadowRenderer pssm;
+    
+    //Kinect stuff
     KinectInterface kinect;
     KinectSkeleton kinectskeleton;
-    BulletAppState bulletAppState;
     Mocap moCap;
+    
     //Gui stuff
     gui mygui;
     Geometry geom;
 
+    //Environment
+    KinematicObject floor;
+    
     public static void main(String[] args) {
         Main app = new Main();
         app.start();
@@ -31,18 +41,19 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
-
+        initLighting();
+        physicsInit();
+        KinematicObject.addListener(this);
+        KinematicCylinder.addListener(this);
+        
+        /*  Kinect stuff    */
         moCap = new Mocap();
-
         mygui = new gui(this);
         kinect = new KinectInterface(this);
         kinect.getData();
         kinectskeleton = new KinectSkeleton(this);
        
-
-        bulletAppState = new BulletAppState();
-        stateManager.attach(bulletAppState);
-
+        floor   = new KinematicObject(new Geometry("Lulz",new Box(5,0.1f,5)) , new Vector3f(-2.5f,-0.75f,2.5f));
         
         Box b = new Box(Vector3f.ZERO, 1, 1, 1);
         Geometry geom = new Geometry("Box", b);
@@ -51,7 +62,8 @@ public class Main extends SimpleApplication {
         mat.setColor("Color", ColorRGBA.Blue);
         geom.setMaterial(mat);
 
-        rootNode.attachChild(geom);
+        //rootNode.attachChild(geom);
+        flyCam.setMoveSpeed(50);
     }
   //Here is a comment
     @Override
@@ -93,5 +105,17 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
+    }
+    
+    private void initLighting() {
+        pssm = new PssmShadowRenderer(assetManager, 1024, 3);
+        pssm.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
+        viewPort.addProcessor(pssm);
+    }
+    
+    private void physicsInit(){
+        bulletAppState = new BulletAppState();
+        stateManager.attach(bulletAppState);
+        bulletAppState.getPhysicsSpace().enableDebug(assetManager);
     }
 }
