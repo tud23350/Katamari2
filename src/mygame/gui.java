@@ -28,9 +28,9 @@ public class gui extends JFrame implements ActionListener {
         //4
         JLabel jt = new JLabel("Here is my simple Gui");
         add(jt);
-        JButton jb2 = new JButton("green");
+        JButton jb2 = new JButton("Initalize Environment");
         add(jb2);
-        JButton jb3 = new JButton("blue");
+        JButton jb3 = new JButton("Play Game");
         add(jb3);
 
         //5 Add Functionality

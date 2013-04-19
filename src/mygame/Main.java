@@ -1,6 +1,7 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -42,6 +43,7 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         initLighting();
         physicsInit();
+        initAudio();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
@@ -73,7 +75,8 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
         if (mygui.getchanged()) {
-            if ("green".equals(mygui.s)) {
+            if ("Initalize Environment".equals(mygui.s)) {
+                /*
                 rootNode.detachAllChildren();
                 Box b = new Box(Vector3f.ZERO, 1, 1, 1);
                 geom = new Geometry("Box", b);
@@ -83,8 +86,11 @@ public class Main extends SimpleApplication {
                 geom.setMaterial(mat);
 
                 rootNode.attachChild(geom);
+                * */
+                kinect.c1.readDepthXYZ();
+                mygui.resetchanged();
             }
-            if ("blue".equals(mygui.s)) {
+            if ("Play Game".equals(mygui.s)) {
                 rootNode.detachAllChildren();
                 Box b = new Box(Vector3f.ZERO, 2, 2, 2);
                 geom = new Geometry("Box", b);
@@ -94,6 +100,7 @@ public class Main extends SimpleApplication {
                 geom.setMaterial(mat);
 
                 rootNode.attachChild(geom);
+                
             }
             geom.rotate(0, 0, 5f);
             mygui.resetchanged();
@@ -122,5 +129,14 @@ public class Main extends SimpleApplication {
         stateManager.attach(bulletAppState);
         //bulletAppState.getPhysicsSpace().enableDebug(assetManager);
         bulletAppState.getPhysicsSpace().setAccuracy(1f/120f);
+    }
+    private void initAudio() {
+    AudioNode game_music = new AudioNode(assetManager, "prime.ogg", false);
+    game_music.setLooping(true);  // activate continuous playing
+    game_music.setPositional(true);
+    game_music.setLocalTranslation(Vector3f.ZERO.clone());
+    game_music.setVolume(3);
+    rootNode.attachChild(game_music);
+    game_music.play(); // play continuously!
     }
 }
