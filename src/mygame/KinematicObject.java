@@ -68,11 +68,11 @@ public class KinematicObject{
         //initialize physics
         shape = new HullCollisionShape(geom.getMesh());
         ghost = new GhostControl(shape);
-        geom.addControl(ghost);
+        selfNode.addControl(ghost);
         
-        geom.setLocalTranslation(position);
+        selfNode.setLocalTranslation(position);
         rigidBody = new RigidBodyControl(shape, 1f);
-        geom.addControl(rigidBody);
+        selfNode.addControl(rigidBody);
         rigidBody.setKinematic(true);
  
         selfNode.setName("physical");

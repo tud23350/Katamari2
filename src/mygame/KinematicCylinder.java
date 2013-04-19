@@ -31,7 +31,6 @@ public class KinematicCylinder{
     
     Material mat;
     Geometry geom;
-    private static boolean hasMain = false;
     private static Main main;
     private static AssetManager assetManager;
     
@@ -44,7 +43,6 @@ public class KinematicCylinder{
     
     
     public static void addListener(Main main){
-        hasMain = true;
         KinematicCylinder.main = main;
         assetManager = main.getAssetManager();
     }
@@ -70,7 +68,7 @@ public class KinematicCylinder{
         
         //initialize physics
         shape = new CylinderCollisionShape(new Vector3f(c.getRadius(), c.getAxisSamples(), c.getHeight()/7f));
-        geom.setLocalTranslation(position);
+        selfNode.setLocalTranslation(position);
         rigidBody = new RigidBodyControl(shape, 1f);
 
         rigidBody.setKinematic(true);
@@ -79,8 +77,8 @@ public class KinematicCylinder{
         
         selfNode.setName("physical");
         
-        geom.addControl(ghost);
-        geom.addControl(rigidBody);
+        selfNode.addControl(ghost);
+        selfNode.addControl(rigidBody);
         main.bulletAppState.getPhysicsSpace().add(rigidBody);
         main.bulletAppState.getPhysicsSpace().add(ghost);
         //main.bulletAppState.getPhysicsSpace().addCollisionListener(this);

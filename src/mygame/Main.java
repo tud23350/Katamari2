@@ -45,6 +45,7 @@ public class Main extends SimpleApplication {
         physicsInit();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
+        InteractiveObject.addListener(this);
         
         /*  Kinect stuff    */
         moCap = new Mocap();
@@ -54,6 +55,8 @@ public class Main extends SimpleApplication {
         kinectskeleton = new KinectSkeleton(this);
        
         floor   = new KinematicObject(new Geometry("Lulz",new Box(5,0.1f,5)) , new Vector3f(-2.5f,-0.75f,2.5f));
+        
+        Environment.create();
         
         Box b = new Box(Vector3f.ZERO, 1, 1, 1);
         Geometry geom = new Geometry("Box", b);

@@ -20,9 +20,9 @@ public class KinectSkeleton {
     
     boolean madeSkeleton = false;
     Node skeleton = new Node(); // this is the skeleton, which connects to the root node.
-    Geometry[] bones = new Geometry[13]; //13 is the number of cylinders we will have representing bones
+    Node[] bones = new Node[13]; //13 is the number of cylinders we will have representing bones
 
-    private final float scaleFactor = 1000f;
+    private final float scaleFactor = 800f;
     
     public void createSkeleton() {
         if (main.kinect.joint != null) {
@@ -62,16 +62,9 @@ public class KinectSkeleton {
                 //new KinematicCylinder(new Geometry("Cylinder", c), Vector3f.ZERO);
                 KinematicCylinder ko = new KinematicCylinder(c, Vector3f.ZERO);
                 //set geometry, connect and transform cylinder, set material
-                bones[i] = ko.geom;//new Geometry("Cylinder", c);
+                bones[i] = ko.topLayerNode;//new Geometry("Cylinder", c);
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
-                bones[i].setMaterial(matW);
-                //attach physics to bones
-                //RigidBodyControl phy = new RigidBodyControl(1f); //0f = 0 mass
-                //bones[i].addControl(phy);
-                //phy.setKinematic(true);
-                //attach physics to world
-                //main.bulletAppState.getPhysicsSpace().add(phy);
-                //attach to node so we can play
+
                 
                 skeleton.attachChild(bones[i]);
                 main.getRootNode().attachChild(skeleton);
@@ -128,7 +121,7 @@ public class KinectSkeleton {
         }
     }
 
-    private void setConnectiveTransform(float[] p1, float[] p2, Geometry c) {
+    private void setConnectiveTransform(float[] p1, float[] p2, Node c) {
         //Find Direction
         Vector3f u = new Vector3f(p2[0] - p1[0], p2[1] - p1[1], p2[2] - p1[2]);
         float length = u.length();
