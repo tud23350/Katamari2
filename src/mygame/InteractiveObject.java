@@ -67,6 +67,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
         shape = new HullCollisionShape(geom.getMesh());
         parasiticNode.setLocalTranslation(position);
         rigidBody = new RigidBodyControl(shape, 1f);
+        rigidBody.setFriction(1f);
         rigidBody.setKinematic(kinematic);
  
         ghost = new GhostControl(shape);

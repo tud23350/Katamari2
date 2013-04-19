@@ -31,8 +31,7 @@ public class Main extends SimpleApplication {
     gui mygui;
     Geometry geom;
 
-    //Environment
-    KinematicObject floor;
+    
     
     public static void main(String[] args) {
         Main app = new Main();
@@ -46,6 +45,8 @@ public class Main extends SimpleApplication {
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
+        Inert.addListener(this);
+        
         
         /*  Kinect stuff    */
         moCap = new Mocap();
@@ -54,7 +55,7 @@ public class Main extends SimpleApplication {
         kinect.getData();
         kinectskeleton = new KinectSkeleton(this);
        
-        floor   = new KinematicObject(new Geometry("Lulz",new Box(5,0.1f,5)) , new Vector3f(-2.5f,-0.75f,2.5f));
+        
         
         Environment.create();
         
@@ -120,5 +121,6 @@ public class Main extends SimpleApplication {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().enableDebug(assetManager);
+        bulletAppState.getPhysicsSpace().setAccuracy(1f/240f);
     }
 }
