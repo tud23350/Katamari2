@@ -120,7 +120,7 @@ public class Main extends SimpleApplication {
     private void physicsInit(){
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        bulletAppState.getPhysicsSpace().enableDebug(assetManager);
-        bulletAppState.getPhysicsSpace().setAccuracy(1f/240f);
+        //bulletAppState.getPhysicsSpace().enableDebug(assetManager);
+        bulletAppState.getPhysicsSpace().setAccuracy(1f/120f);
     }
 }

@@ -71,7 +71,7 @@ public class Inert{
         selfNode.addControl(ghost);
         
         selfNode.setLocalTranslation(position);
-        rigidBody = new RigidBodyControl(shape, 1f);
+        rigidBody = new RigidBodyControl(shape, 0f);
         rigidBody.setFriction(1f);
         selfNode.addControl(rigidBody);
         rigidBody.setKinematic(true);
