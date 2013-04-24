@@ -32,11 +32,14 @@ public class gui extends JFrame implements ActionListener {
         add(jb2);
         JButton jb3 = new JButton("Play Game");
         add(jb3);
+        JButton jb4 = new JButton("Take Picture");
+        add(jb4);
 
         //5 Add Functionality
 
         jb2.addActionListener(this);
         jb3.addActionListener(this);
+        jb4.addActionListener(this);
 
         //6
         pack();

@@ -12,6 +12,7 @@ import com.jme3.scene.shape.Cylinder;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import kinecttcpclient.KinectTCPClient;
 
 /**
  *
@@ -28,41 +29,43 @@ public class KinectSkeleton {
     Node[] bones = new Node[13]; //13 is the number of cylinders we will have representing bones
     Vector3f boneTranslation[] = new Vector3f[13];
     KinematicObject[] boneObject = new KinematicObject[13];
+    int [][] joint;
 
     private final float scaleFactor = 800f;
     
     public void createSkeleton() {
-        if (main.kinect.joint != null) {
+        if (main.kinect != null) {
+            int[] skRaw = main.kinect.readSkeleton();
+            joint = KinectTCPClient.getJointPositions(skRaw, 1);
             Material matW = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             matW.setColor("Color", ColorRGBA.White);
             //starting joints
-            float[][] StartingJoint = {{(float) main.kinect.joint[10][1] / scaleFactor, (float) main.kinect.joint[10][2] / scaleFactor, (float) main.kinect.joint[10][3] / scaleFactor}, //right wrist
-                {(float) main.kinect.joint[9][1] / scaleFactor, (float) main.kinect.joint[9][2] / scaleFactor, (float) main.kinect.joint[9][3] / scaleFactor}, //right elbow
-                {(float) main.kinect.joint[8][1] / scaleFactor, (float) main.kinect.joint[8][2] / scaleFactor, (float) main.kinect.joint[8][3] / scaleFactor}, //right shoulder
-                {(float) main.kinect.joint[2][1] / scaleFactor, (float) main.kinect.joint[2][2] / scaleFactor, (float) main.kinect.joint[2][3] / scaleFactor}, //shoulder center
-                {(float) main.kinect.joint[4][1] / scaleFactor, (float) main.kinect.joint[4][2] / scaleFactor, (float) main.kinect.joint[4][3] / scaleFactor}, //left shoulder
-                {(float) main.kinect.joint[5][1] / scaleFactor, (float) main.kinect.joint[5][2] / scaleFactor, (float) main.kinect.joint[5][3] / scaleFactor}, //left elbow
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[13][1] / scaleFactor, (float) main.kinect.joint[13][2] / scaleFactor, (float) main.kinect.joint[13][3] / scaleFactor}, //left knee
-                {(float) main.kinect.joint[17][1] / scaleFactor, (float) main.kinect.joint[17][2] / scaleFactor, (float) main.kinect.joint[17][3] / scaleFactor}}; //right knee
+            float[][] StartingJoint = {{(float) joint[10][1] / scaleFactor, (float) joint[10][2] / scaleFactor, (float) joint[10][3] / scaleFactor}, //right wrist
+                {(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
+                {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
+                {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
+                {(float) joint[5][1] / scaleFactor, (float) joint[5][2] / scaleFactor, (float) joint[5][3] / scaleFactor}, //left elbow
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[13][1] / scaleFactor, (float) joint[13][2] / scaleFactor, (float) joint[13][3] / scaleFactor}, //left knee
+                {(float) joint[17][1] / scaleFactor, (float) joint[17][2] / scaleFactor, (float) joint[17][3] / scaleFactor}}; //right knee
             //joint the starting joints connect to
-            float[][] ConnectingJoint = {{(float) main.kinect.joint[9][1] / scaleFactor, (float) main.kinect.joint[9][2] / scaleFactor, (float) main.kinect.joint[9][3] / scaleFactor}, //right elbow
-                {(float) main.kinect.joint[8][1] / scaleFactor, (float) main.kinect.joint[8][2] / scaleFactor, (float) main.kinect.joint[8][3] / scaleFactor}, //right shoulder
-                {(float) main.kinect.joint[2][1] / scaleFactor, (float) main.kinect.joint[2][2] / scaleFactor, (float) main.kinect.joint[2][3] / scaleFactor}, //shoulder center
-                {(float) main.kinect.joint[4][1] / scaleFactor, (float) main.kinect.joint[4][2] / scaleFactor, (float) main.kinect.joint[4][3] / scaleFactor}, //left shoulder
-                {(float) main.kinect.joint[5][1] / scaleFactor, (float) main.kinect.joint[5][2] / scaleFactor, (float) main.kinect.joint[5][3] / scaleFactor}, //left elbow
-                {(float) main.kinect.joint[6][1] / scaleFactor, (float) main.kinect.joint[6][2] / scaleFactor, (float) main.kinect.joint[6][3] / scaleFactor}, //left wrist
-                {(float) main.kinect.joint[2][1] / scaleFactor, (float) main.kinect.joint[2][2] / scaleFactor, (float) main.kinect.joint[2][3] / scaleFactor}, //shoulder center
-                {(float) main.kinect.joint[8][1] / scaleFactor, (float) main.kinect.joint[8][2] / scaleFactor, (float) main.kinect.joint[8][3] / scaleFactor}, //right shoulder
-                {(float) main.kinect.joint[4][1] / scaleFactor, (float) main.kinect.joint[4][2] / scaleFactor, (float) main.kinect.joint[4][3] / scaleFactor}, //left shoulder
-                {(float) main.kinect.joint[13][1] / scaleFactor, (float) main.kinect.joint[13][2] / scaleFactor, (float) main.kinect.joint[13][3] / scaleFactor}, //left knee
-                {(float) main.kinect.joint[17][1] / scaleFactor, (float) main.kinect.joint[17][2] / scaleFactor, (float) main.kinect.joint[17][3] / scaleFactor}, //right knee
-                {(float) main.kinect.joint[14][1] / scaleFactor, (float) main.kinect.joint[14][2] / scaleFactor, (float) main.kinect.joint[14][3] / scaleFactor}, //left ankle
-                {(float) main.kinect.joint[18][1] / scaleFactor, (float) main.kinect.joint[18][2] / scaleFactor, (float) main.kinect.joint[18][3] / scaleFactor}}; //right ankle
+            float[][] ConnectingJoint = {{(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
+                {(float) joint[8][1] / scaleFactor, (float) joint[8][2] / scaleFactor, (float) joint[8][3] / scaleFactor}, //right shoulder
+                {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
+                {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
+                {(float) joint[5][1] / scaleFactor, (float) joint[5][2] / scaleFactor, (float) joint[5][3] / scaleFactor}, //left elbow
+                {(float) joint[6][1] / scaleFactor, (float) joint[6][2] / scaleFactor, (float) joint[6][3] / scaleFactor}, //left wrist
+                {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
+                {(float) joint[8][1] / scaleFactor, (float) joint[8][2] / scaleFactor, (float) joint[8][3] / scaleFactor}, //right shoulder
+                {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
+                {(float) joint[13][1] / scaleFactor, (float) joint[13][2] / scaleFactor, (float) joint[13][3] / scaleFactor}, //left knee
+                {(float) joint[17][1] / scaleFactor, (float) joint[17][2] / scaleFactor, (float) joint[17][3] / scaleFactor}, //right knee
+                {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
+                {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             //start loop to connect all joints
             for (int i = 0; i < bones.length; i++) {
                 Cylinder c = new Cylinder(10, 10, 0.09f, 1f, true);
@@ -90,35 +93,35 @@ public class KinectSkeleton {
     }
 
     public void updateMovements() {
-        if (madeSkeleton == true && main.kinect.joint != null) {
+        if (madeSkeleton == true && joint != null) {
             //starting joints
-            float[][] StartingJoint = {{(float) main.kinect.joint[10][1] / scaleFactor, (float) main.kinect.joint[10][2] / scaleFactor, (float) main.kinect.joint[10][3] / scaleFactor}, //right wrist
-                {(float) main.kinect.joint[9][1] / scaleFactor, (float) main.kinect.joint[9][2] / scaleFactor, (float) main.kinect.joint[9][3] / scaleFactor}, //right elbow
-                {(float) main.kinect.joint[8][1] / scaleFactor, (float) main.kinect.joint[8][2] / scaleFactor, (float) main.kinect.joint[8][3] / scaleFactor}, //right shoulder
-                {(float) main.kinect.joint[2][1] / scaleFactor, (float) main.kinect.joint[2][2] / scaleFactor, (float) main.kinect.joint[2][3] / scaleFactor}, //shoulder center
-                {(float) main.kinect.joint[4][1] / scaleFactor, (float) main.kinect.joint[4][2] / scaleFactor, (float) main.kinect.joint[4][3] / scaleFactor}, //left shoulder
-                {(float) main.kinect.joint[5][1] / scaleFactor, (float) main.kinect.joint[5][2] / scaleFactor, (float) main.kinect.joint[5][3] / scaleFactor}, //left elbow
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[0][1] / scaleFactor, (float) main.kinect.joint[0][2] / scaleFactor, (float) main.kinect.joint[0][3] / scaleFactor}, //hip center
-                {(float) main.kinect.joint[13][1] / scaleFactor, (float) main.kinect.joint[13][2] / scaleFactor, (float) main.kinect.joint[13][3] / scaleFactor}, //left knee
-                {(float) main.kinect.joint[17][1] / scaleFactor, (float) main.kinect.joint[17][2] / scaleFactor, (float) main.kinect.joint[17][3] / scaleFactor}}; //right knee
+            float[][] StartingJoint = {{(float) joint[10][1] / scaleFactor, (float) joint[10][2] / scaleFactor, (float) joint[10][3] / scaleFactor}, //right wrist
+                {(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
+                {(float) joint[8][1] / scaleFactor, (float) joint[8][2] / scaleFactor, (float) joint[8][3] / scaleFactor}, //right shoulder
+                {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
+                {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
+                {(float) joint[5][1] / scaleFactor, (float) joint[5][2] / scaleFactor, (float) joint[5][3] / scaleFactor}, //left elbow
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[0][1] / scaleFactor, (float) joint[0][2] / scaleFactor, (float) joint[0][3] / scaleFactor}, //hip center
+                {(float) joint[13][1] / scaleFactor, (float) joint[13][2] / scaleFactor, (float) joint[13][3] / scaleFactor}, //left knee
+                {(float) joint[17][1] / scaleFactor, (float) joint[17][2] / scaleFactor, (float) joint[17][3] / scaleFactor}}; //right knee
             //joint the starting joints connect to
-            float[][] ConnectingJoint = {{(float) main.kinect.joint[9][1] / scaleFactor, (float) main.kinect.joint[9][2] / scaleFactor, (float) main.kinect.joint[9][3] / scaleFactor}, //right elbow
-                {(float) main.kinect.joint[8][1] / scaleFactor, (float) main.kinect.joint[8][2] / scaleFactor, (float) main.kinect.joint[8][3] / scaleFactor}, //right shoulder
-                {(float) main.kinect.joint[2][1] / scaleFactor, (float) main.kinect.joint[2][2] / scaleFactor, (float) main.kinect.joint[2][3] / scaleFactor}, //shoulder center
-                {(float) main.kinect.joint[4][1] / scaleFactor, (float) main.kinect.joint[4][2] / scaleFactor, (float) main.kinect.joint[4][3] / scaleFactor}, //left shoulder
-                {(float) main.kinect.joint[5][1] / scaleFactor, (float) main.kinect.joint[5][2] / scaleFactor, (float) main.kinect.joint[5][3] / scaleFactor}, //left elbow
-                {(float) main.kinect.joint[6][1] / scaleFactor, (float) main.kinect.joint[6][2] / scaleFactor, (float) main.kinect.joint[6][3] / scaleFactor}, //left wrist
-                {(float) main.kinect.joint[2][1] / scaleFactor, (float) main.kinect.joint[2][2] / scaleFactor, (float) main.kinect.joint[2][3] / scaleFactor}, //shoulder center
-                {(float) main.kinect.joint[8][1] / scaleFactor, (float) main.kinect.joint[8][2] / scaleFactor, (float) main.kinect.joint[8][3] / scaleFactor}, //right shoulder
-                {(float) main.kinect.joint[4][1] / scaleFactor, (float) main.kinect.joint[4][2] / scaleFactor, (float) main.kinect.joint[4][3] / scaleFactor}, //left shoulder
-                {(float) main.kinect.joint[13][1] / scaleFactor, (float) main.kinect.joint[13][2] / scaleFactor, (float) main.kinect.joint[13][3] / scaleFactor}, //left knee
-                {(float) main.kinect.joint[17][1] / scaleFactor, (float) main.kinect.joint[17][2] / scaleFactor, (float) main.kinect.joint[17][3] / scaleFactor}, //right knee
-                {(float) main.kinect.joint[14][1] / scaleFactor, (float) main.kinect.joint[14][2] / scaleFactor, (float) main.kinect.joint[14][3] / scaleFactor}, //left ankle
-                {(float) main.kinect.joint[18][1] / scaleFactor, (float) main.kinect.joint[18][2] / scaleFactor, (float) main.kinect.joint[18][3] / scaleFactor}}; //right ankle
+            float[][] ConnectingJoint = {{(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
+                {(float) joint[8][1] / scaleFactor, (float) joint[8][2] / scaleFactor, (float) joint[8][3] / scaleFactor}, //right shoulder
+                {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
+                {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
+                {(float) joint[5][1] / scaleFactor, (float) joint[5][2] / scaleFactor, (float) joint[5][3] / scaleFactor}, //left elbow
+                {(float) joint[6][1] / scaleFactor, (float) joint[6][2] / scaleFactor, (float) joint[6][3] / scaleFactor}, //left wrist
+                {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
+                {(float) joint[8][1] / scaleFactor, (float) joint[8][2] / scaleFactor, (float) joint[8][3] / scaleFactor}, //right shoulder
+                {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
+                {(float) joint[13][1] / scaleFactor, (float) joint[13][2] / scaleFactor, (float) joint[13][3] / scaleFactor}, //left knee
+                {(float) joint[17][1] / scaleFactor, (float) joint[17][2] / scaleFactor, (float) joint[17][3] / scaleFactor}, //right knee
+                {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
+                {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             for (int i = 0; i < bones.length; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
                 bones[i] = boneObject[i].selfNode;
