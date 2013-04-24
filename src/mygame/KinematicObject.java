@@ -77,8 +77,6 @@ public class KinematicObject{
  
         selfNode.setName("physical");
         
-        
-        
         main.bulletAppState.getPhysicsSpace().add(rigidBody);
         main.bulletAppState.getPhysicsSpace().add(ghost);
         //main.bulletAppState.getPhysicsSpace().addCollisionListener(this);
@@ -94,5 +92,19 @@ public class KinematicObject{
     public void collision(PhysicsCollisionEvent event) {
         
     }
+    
+    public void setShape(Geometry g){
+        CollisionShape s = new HullCollisionShape(g.getMesh());
+        rigidBody.setCollisionShape(s);
+        ghost.setCollisionShape(s);
+    }
+    
+    public void refreshShape(){
+        CollisionShape s = new HullCollisionShape(geom.getMesh());
+        rigidBody.setCollisionShape(s);
+        ghost.setCollisionShape(s);
+    }
+    
+    
 
 }

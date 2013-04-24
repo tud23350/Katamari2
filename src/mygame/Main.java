@@ -43,7 +43,7 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         initLighting();
         physicsInit();
-        initAudio();
+        //initAudio();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
@@ -127,7 +127,7 @@ public class Main extends SimpleApplication {
     private void physicsInit(){
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        //bulletAppState.getPhysicsSpace().enableDebug(assetManager);
+        bulletAppState.getPhysicsSpace().enableDebug(assetManager);
         bulletAppState.getPhysicsSpace().setAccuracy(1f/120f);
     }
     private void initAudio() {
