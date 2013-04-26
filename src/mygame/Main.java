@@ -29,42 +29,39 @@ import kinecttcpclient.KinectTCPClient;
  * @author Mike Jake and Dave
  */
 public class Main extends SimpleApplication {
-    
-    
+
     //lightings and physics
     BulletAppState bulletAppState;
     PssmShadowRenderer pssm;
-    
     //Kinect stuff
     KinectTCPClient kinect;
+    KinectTCPClient kinect2;
     KinectSkeleton kinectskeleton;
     Mocap moCap;
-    
     //Gui stuff
     gui mygui;
     Geometry geom;
-    
     //RANSAC stuff
     Node[] node;
     Mesh mesh = new Mesh();
     Geometry geo;
     Vector3f[] points;
-    Vector4f[] colors;    
-    
+    Vector4f[] colors;
+
     public static void main(String[] args) {
         Main app = new Main();
         app.start();
     }
 
     public float[][] getData() {
-        kinect = new KinectTCPClient("localhost", 8001);
+        kinect2 = new KinectTCPClient("localhost", 8001);
         int[][] dummyData = null;
-        if (kinect.sayHello() != 214) {
-            kinect = null;
+        if (kinect2.sayHello() != 214) {
+            kinect2 = null;
         } else {
             //kinect.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZINDEX);
-            kinect.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZFULL); // important!
-            dummyData = kinect.readDepthXYZ();
+            kinect2.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZFULL); // important!
+            dummyData = kinect2.readDepthXYZ();
         }
         float[][] kinectPointCloud = new float[dummyData.length][dummyData[0].length];
         for (int a = 0; a < dummyData.length; a++) {
@@ -74,7 +71,7 @@ public class Main extends SimpleApplication {
         }
         return kinectPointCloud;
     }
-    
+
     @Override
     public void simpleInitApp() {
         initLighting();
@@ -84,19 +81,19 @@ public class Main extends SimpleApplication {
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
         Inert.addListener(this);
-        
-        
+
+
         /*  Kinect stuff    */
         moCap = new Mocap();
         mygui = new gui(this);
         //kinect = new KinectInterface(this);
         //kinect.getData();
         kinectskeleton = new KinectSkeleton(this);
-       
-        
-        
+
+
+
         Environment.create();
-        
+
         Box b = new Box(Vector3f.ZERO, 1, 1, 1);
         Geometry geom = new Geometry("Box", b);
 
@@ -107,23 +104,26 @@ public class Main extends SimpleApplication {
         //rootNode.attachChild(geom);
         flyCam.setMoveSpeed(50);
     }
-  //Here is a comment
+    //Here is a comment
+
     @Override
     public void simpleUpdate(float tpf) {
         if (mygui.getchanged()) {
             if ("Initalize Environment".equals(mygui.s)) {
                 /*
-                rootNode.detachAllChildren();
-                Box b = new Box(Vector3f.ZERO, 1, 1, 1);
-                geom = new Geometry("Box", b);
+                 rootNode.detachAllChildren();
+                 Box b = new Box(Vector3f.ZERO, 1, 1, 1);
+                 geom = new Geometry("Box", b);
 
-                Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                mat.setColor("Color", ColorRGBA.Green);
-                geom.setMaterial(mat);
+                 Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+                 mat.setColor("Color", ColorRGBA.Green);
+                 geom.setMaterial(mat);
 
-                rootNode.attachChild(geom);
-                * */
-                kinect.readDepthXYZ();
+                 rootNode.attachChild(geom);
+                 * */
+                if (kinect != null) {
+                    kinect.readDepthXYZ();
+                }
                 mygui.resetchanged();
             }
             if ("Play Game".equals(mygui.s)) {
@@ -136,13 +136,13 @@ public class Main extends SimpleApplication {
                 geom.setMaterial(mat);
 
                 rootNode.attachChild(geom);
-                
+
             }
-            if ("Take Picture".equals(mygui.s)){
+            if ("Take Picture".equals(mygui.s)) {
                 rootNode.detachAllChildren();
                 //RANSAC and Clustering Stuff
                 float[][] kinectPointCloud = getData();
-                
+
                 //do RANSAC -----------------------------------------------
                 float noiseFactor = 50f; // noise of inliers
                 int numberOfIterations = 10;
@@ -156,20 +156,23 @@ public class Main extends SimpleApplication {
                 //rootNode.attachChild(createPointGeometry(inliers, ColorRGBA.Green, 2));
                 //rootNode.attachChild(createPlaneGeometry(floor, planeSize));
 
-//                float[][] outliers = new float[kinectPointCloud.length - inliers.length][4];
-//                int counter, k = 0;
-//                for (int i = 0; i < kinectPointCloud.length; i++) {
-//                    counter = 0;
-//                    for (float[] j : inliers) {
-//                        if (kinectPointCloud[i] == j) {
-//                            counter++;
-//                        }
-//                    }
-//                    if (counter == 0) {
-//                        outliers[k] = kinectPointCloud[i];
-//                        k++;
-//                    }
-//                }
+                float[][] outliers = new float[kinectPointCloud.length - inliers.length][4];
+                int counter, k = 0;
+                for (int i = 0; i < kinectPointCloud.length; i++) {
+                    counter = 0;
+                    for (float[] j : inliers) {
+                        if (kinectPointCloud[i][0] == j[0] && kinectPointCloud[i][1] == j[1] && kinectPointCloud[i][2] == j[2]) {
+                            counter++;
+                        }
+                    }
+                    if (counter == 0) {
+                        outliers[k][0] = kinectPointCloud[i][0];
+                        outliers[k][1] = kinectPointCloud[i][1];
+                        outliers[k][2] = kinectPointCloud[i][2];
+                        outliers[k][3] = 0;
+                        k++;
+                    }
+                }
 
                 //find clusters based on size of euclid_dist between two inliers
                 //param: (list of points, maximum euclidean distance, starting index [should be 0], starting cluster flag
@@ -180,12 +183,12 @@ public class Main extends SimpleApplication {
                 mesh.setMode(Mesh.Mode.Points);
                 mesh.setPointSize(2f);
 
-                points = new Vector3f[inliers.length];
+                points = new Vector3f[outliers.length];
                 float x, y, z;
                 for (int i = 0; i < points.length; i++) {
-                    x = -inliers[i][0] / 1000f;
-                    y = -inliers[i][1] / 1000f;
-                    z = -inliers[i][2] / 1000f;
+                    x = -outliers[i][0] / 1000f;
+                    y = -outliers[i][1] / 1000f;
+                    z = -outliers[i][2] / 1000f;
                     points[i] = new Vector3f(x, y, z);
                 }
                 mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
@@ -198,22 +201,20 @@ public class Main extends SimpleApplication {
                     float b = (float) Math.random();
                     colors[count] = new Vector4f(r, g, b, 1.0f);
                     //System.out.println(outliers[count][3]);
-                    //colors[count] = new Vector4f(outliers[count][3] * 14, outliers[count][3] * 14, outliers[count][3] * 14, 1.0f);
+                    //colors[count] = new Vector4f(outliers[count][3] * 100, outliers[count][3] * 100, outliers[count][3] * 100, 1.0f);
                 }
                 mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
 
                 // create geomtery etc.
                 mesh.updateBound();
-                geom = new Geometry("OurMesh", mesh);
+                geo = new Geometry("OurMesh", mesh);
                 Material matPC = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                matPC.setColor("Color", ColorRGBA.Blue);
                 matPC.setBoolean("VertexColor", true);
-                geom.setMaterial(matPC);
+                geo.setMaterial(matPC);
                 Node pivot = new Node();
-                pivot.attachChild(geom);
+                pivot.attachChild(geo);
                 rootNode.attachChild(pivot);
             }
-            geom.rotate(0, 0, 5f);
             mygui.resetchanged();
         }
         if (geom != null) {
@@ -221,9 +222,9 @@ public class Main extends SimpleApplication {
         }
         //kinect.getData();
         kinectskeleton.updateMovements();
-        
+
     }
-    
+
     public float[][] findClusters(float[][] outliers, float max_dist, int i, float cluster_flag) {
         for (int j = i + 1; j < outliers.length; j++) {
             while (outliers[j][3] != 0) {
@@ -326,26 +327,27 @@ public class Main extends SimpleApplication {
     public void simpleRender(RenderManager rm) {
         //TODO: add render code
     }
-    
+
     private void initLighting() {
         pssm = new PssmShadowRenderer(assetManager, 1024, 3);
         pssm.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
         viewPort.addProcessor(pssm);
     }
-    
-    private void physicsInit(){
+
+    private void physicsInit() {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().enableDebug(assetManager);
-        bulletAppState.getPhysicsSpace().setAccuracy(1f/120f);
+        bulletAppState.getPhysicsSpace().setAccuracy(1f / 120f);
     }
+
     private void initAudio() {
-    AudioNode game_music = new AudioNode(assetManager, "prime.ogg", false);
-    game_music.setLooping(true);  // activate continuous playing
-    game_music.setPositional(true);
-    game_music.setLocalTranslation(Vector3f.ZERO.clone());
-    game_music.setVolume(3);
-    rootNode.attachChild(game_music);
-    game_music.play(); // play continuously!
+        AudioNode game_music = new AudioNode(assetManager, "prime.ogg", false);
+        game_music.setLooping(true);  // activate continuous playing
+        game_music.setPositional(true);
+        game_music.setLocalTranslation(Vector3f.ZERO.clone());
+        game_music.setVolume(3);
+        rootNode.attachChild(game_music);
+        game_music.play(); // play continuously!
     }
 }
