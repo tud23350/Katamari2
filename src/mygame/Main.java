@@ -83,6 +83,10 @@ public class Main extends SimpleApplication {
         InteractiveObject.addListener(this);
         Inert.addListener(this);
 
+        kinect = new KinectTCPClient("localhost",8001);
+        if(kinect.sayHello()!= 214){
+            kinect = null;
+        }
 
         /*  Kinect stuff    */
         moCap = new Mocap();
@@ -103,7 +107,7 @@ public class Main extends SimpleApplication {
         geom.setMaterial(mat);
 
         //rootNode.attachChild(geom);
-        flyCam.setMoveSpeed(50);
+        flyCam.setMoveSpeed(10);
     }
     //Here is a comment
 
@@ -111,17 +115,7 @@ public class Main extends SimpleApplication {
     public void simpleUpdate(float tpf) {
         if (mygui.getchanged()) {
             if ("Initalize Environment".equals(mygui.s)) {
-                /*
-                 rootNode.detachAllChildren();
-                 Box b = new Box(Vector3f.ZERO, 1, 1, 1);
-                 geom = new Geometry("Box", b);
-
-                 Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                 mat.setColor("Color", ColorRGBA.Green);
-                 geom.setMaterial(mat);
-
-                 rootNode.attachChild(geom);
-                 * */
+                Environment.create();
                 if (kinect != null) {
                     kinect.readDepthXYZ();
                 }

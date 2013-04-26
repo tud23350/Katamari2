@@ -54,6 +54,7 @@ public class KinectSkeleton {
             //starting joints
             float[][] StartingJoint = {{(float) joint[10][1] / scaleFactor, (float) joint[10][2] / scaleFactor, (float) joint[10][3] / scaleFactor}, //right wrist
                 {(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
+                {(float) joint[8][1] / scaleFactor, (float) joint[8][2] / scaleFactor, (float) joint[8][3] / scaleFactor}, //right shoulder
                 {(float) joint[2][1] / scaleFactor, (float) joint[2][2] / scaleFactor, (float) joint[2][3] / scaleFactor}, //shoulder center
                 {(float) joint[4][1] / scaleFactor, (float) joint[4][2] / scaleFactor, (float) joint[4][3] / scaleFactor}, //left shoulder
                 {(float) joint[5][1] / scaleFactor, (float) joint[5][2] / scaleFactor, (float) joint[5][3] / scaleFactor}, //left elbow
