@@ -9,6 +9,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -33,10 +34,21 @@ public class KinectSkeleton {
 
     private final float scaleFactor = 800f;
     
-    public void createSkeleton() {
+    private int[][] getJoints(){
+        int [][]tmp;
         if (main.kinect != null) {
             int[] skRaw = main.kinect.readSkeleton();
-            joint = KinectTCPClient.getJointPositions(skRaw, 1);
+            tmp = KinectTCPClient.getJointPositions(skRaw, 1);
+        }else{
+            tmp = main.moCap.getJoints();
+        }
+        return tmp;
+    }
+    
+    public void createSkeleton() {
+        
+        joint = getJoints();
+        if(joint!=null){
             Material matW = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
             matW.setColor("Color", ColorRGBA.White);
             //starting joints
@@ -67,7 +79,8 @@ public class KinectSkeleton {
                 {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             //start loop to connect all joints
-            for (int i = 0; i < bones.length; i++) {
+            System.out.println("Bone length: "+bones.length);
+            for (int i = 0; i < bones.length-1; i++) {
                 Cylinder c = new Cylinder(10, 10, 0.09f, 1f, true);
                 //new KinematicCylinder(new Geometry("Cylinder", c), Vector3f.ZERO);
                 //KinematicCylinder ko = new KinematicCylinder(c, Vector3f.ZERO);
@@ -81,10 +94,10 @@ public class KinectSkeleton {
             }
             
             madeSkeleton = true;
-        } else {
-            System.out.println("NULL!");
-
+        }else{
+            System.out.println("Bone length: "+bones.length);
         }
+
     }
 
     // This should initalize the skeleton. Movements should be handled in update Movements
@@ -94,6 +107,7 @@ public class KinectSkeleton {
 
     public void updateMovements() {
         if (madeSkeleton == true && joint != null) {
+            joint = getJoints();
             //starting joints
             float[][] StartingJoint = {{(float) joint[10][1] / scaleFactor, (float) joint[10][2] / scaleFactor, (float) joint[10][3] / scaleFactor}, //right wrist
                 {(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
@@ -122,7 +136,9 @@ public class KinectSkeleton {
                 {(float) joint[17][1] / scaleFactor, (float) joint[17][2] / scaleFactor, (float) joint[17][3] / scaleFactor}, //right knee
                 {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
-            for (int i = 0; i < bones.length; i++) {
+            
+            System.out.println(bones.length);
+            for (int i = 0; i <bones.length-1; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
                 bones[i] = boneObject[i].selfNode;
                 float heightScale = bones[i].getLocalScale().z;
