@@ -35,18 +35,19 @@ public class Main extends SimpleApplication {
     PssmShadowRenderer pssm;
     //Kinect stuff
     KinectTCPClient kinect;
-    KinectTCPClient kinect2;
     KinectSkeleton kinectskeleton;
     Mocap moCap;
     //Gui stuff
     gui mygui;
     Geometry geom;
     //RANSAC stuff
+    KinectTCPClient kinect2;
     Node[] node;
     Mesh mesh = new Mesh();
     Geometry geo;
     Vector3f[] points;
     Vector4f[] colors;
+    float clust_flag = 0;
 
     public static void main(String[] args) {
         Main app = new Main();
@@ -174,10 +175,31 @@ public class Main extends SimpleApplication {
                     }
                 }
 
-                //find clusters based on size of euclid_dist between two inliers
-                //param: (list of points, maximum euclidean distance, starting index [should be 0], starting cluster flag
-                //outliers = findClusters(outliers, 20f, 0, 1f);
-
+                float[][] euclid_dis = new float[outliers.length][outliers.length];
+                for (int i = 0; i < euclid_dis.length; i++) {
+                    for (int j = 0; j < euclid_dis[0].length; j++) {
+                        euclid_dis[i][j] = (float) Math.sqrt(Math.abs((outliers[i][0] - outliers[j][0]) * (outliers[i][0] - outliers[j][0])
+                                + (outliers[i][1] - outliers[j][1]) * (outliers[i][1] - outliers[j][1])
+                                + (outliers[i][2] - outliers[j][2]) * (outliers[i][2] - outliers[j][2])));
+                    }
+                }
+                float max_dist = 20f;
+                for(int i=0;i<euclid_dis.length;i++){
+                    for(int j=i;j<euclid_dis[0].length;j++){
+                        if(euclid_dis[i][j] <= max_dist){
+                            if(outliers[i][3] == 0 && outliers[j][3] == 0){
+                                clust_flag++;
+                                outliers[i][3] = clust_flag;
+                                outliers[j][3] = clust_flag;
+                            } else if(outliers[i][3] != 0 && outliers[j][3] == 0){
+                                outliers[j][3] = outliers[i][3];
+                            } else if(outliers[i][3] == 0 && outliers[j][3] != 0){
+                                outliers[i][3] = outliers[j][3];
+                            }
+                        }
+                    }
+                }
+                
                 // create mesh
                 mesh = new Mesh();
                 mesh.setMode(Mesh.Mode.Points);
@@ -201,7 +223,7 @@ public class Main extends SimpleApplication {
                     float b = (float) Math.random();
                     colors[count] = new Vector4f(r, g, b, 1.0f);
                     //System.out.println(outliers[count][3]);
-                    //colors[count] = new Vector4f(outliers[count][3] * 100, outliers[count][3] * 100, outliers[count][3] * 100, 1.0f);
+                    //colors[count] = new Vector4f(outliers[count][3] * 6, outliers[count][3] * 6, outliers[count][3] * 6, 1.0f);
                 }
                 mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
 
@@ -223,24 +245,6 @@ public class Main extends SimpleApplication {
         //kinect.getData();
         kinectskeleton.updateMovements();
 
-    }
-
-    public float[][] findClusters(float[][] outliers, float max_dist, int i, float cluster_flag) {
-        for (int j = i + 1; j < outliers.length; j++) {
-            while (outliers[j][3] != 0) {
-                j++;
-            }
-            float euclid_dist = (float) Math.sqrt(Math.abs((outliers[i][0] - outliers[j][0]) * (outliers[i][0] - outliers[j][0])
-                    + (outliers[i][1] - outliers[j][1]) * (outliers[i][1] - outliers[j][1])
-                    + (outliers[i][2] - outliers[j][2]) * (outliers[i][2] - outliers[j][2])));
-            if (euclid_dist <= max_dist) {
-                outliers[i][3] = cluster_flag;
-                outliers[j][3] = cluster_flag;
-                findClusters(outliers, max_dist, j, cluster_flag);
-                cluster_flag++;
-            }
-        }
-        return outliers;
     }
 
     // create point-subset of inliers, from RANSAC inlier list ---
