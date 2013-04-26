@@ -16,7 +16,7 @@ import com.jme3.scene.shape.Box;
 public class TestBox extends InteractiveObject{
 
     public TestBox(Vector3f position, Vector3f size) {
-        super(new Geometry("Nyan Nyan", new Box(size.x, size.y, size.z)), position);
+        super(new Geometry("Nyan", new Box(size.x, size.y, size.z)), position);
         
     }
     

@@ -28,7 +28,7 @@ public class KinectInterface {
             int[] skRaw = c1.readSkeleton();
             joint = KinectTCPClient.getJointPositions(skRaw, 1);
         } else {
-            joint = m.moCap.getJoints();
+            joint = m.mocap.getJoints();
         }
     }
 }
