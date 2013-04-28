@@ -98,8 +98,8 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             System.out.println("Sticky object hit floor "+System.currentTimeMillis());
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
-            topLayerNode = a.getParent();
-            topLayerNode.attachChild(parasiticNode);
+            //topLayerNode = a.getParent();
+            b.attachChild(parasiticNode);
             
             removeSelf = true;
             
@@ -108,8 +108,8 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
             
-            topLayerNode = b.getParent();
-            topLayerNode.attachChild(parasiticNode);
+            //topLayerNode = b.getParent();
+            b.attachChild(parasiticNode);
             
             removeSelf = true;
             

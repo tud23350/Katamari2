@@ -166,24 +166,22 @@ public class KinectSkeleton {
         bone.setLocalScale(1, 1, length);
         
         //Set Translation
-        Vector3f oldCenter = bone.getLocalTranslation();
+//        Vector3f oldCenter = bone.getLocalTranslation();
         
         float[] center = {(p1[0] + p2[0]) / 2f, (p1[1] + p2[1]) / 2f, (p1[2] + p2[2]) / 2f};
         bone.setLocalTranslation(center[0], center[1], center[2]);
-        Vector3f newCenter = bone.getLocalTranslation();
+//        Vector3f newCenter = bone.getLocalTranslation();
         
-        Vector3f  difference = new Vector3f(newCenter.x-oldCenter.x,newCenter.y-oldCenter.y,newCenter.z-oldCenter.z);
+//        Vector3f  difference = new Vector3f(newCenter.x-oldCenter.x,newCenter.y-oldCenter.y,newCenter.z-oldCenter.z);
         
-        List<Spatial> l = bone.getParent().getChildren();
+        List<Spatial> l = bone.getChildren();
         ListIterator<Spatial> i = l.listIterator();
         
         while(i.hasNext()){
             Spatial s = i.next();
-            Node n = (Node) s;
-            if(n.getName().equals("sticky")){
-                n.setLocalRotation(m);
-                //n.move(difference);
-                //n.setLocalTranslation(center[0], center[1], center[2]);
+            //Node n = (Node) s;
+            if(s.getName().equals("sticky")){
+                s.setLocalScale(1, 1, (float) 1./length);
                 
             }
         }
