@@ -89,7 +89,9 @@ public class KinectSkeleton {
                 //set geometry, connect and transform cylinder, set material
                 bones[i] = boneObject[i].selfNode;//new Geometry("Cylinder", c);
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
-                
+                float heightScale = bones[i].getLocalScale().z;
+
+                boneObject[i].setShape(new Geometry("New Shape",new Cylinder(10, 10, 0.09f, 1f*heightScale, true)));
                 skeleton.attachChild(bones[i]);
                 main.getRootNode().attachChild(skeleton);
             }
@@ -165,24 +167,18 @@ public class KinectSkeleton {
         //Set Scaling
         bone.setLocalScale(1, 1, length);
         
-        //Set Translation
-//        Vector3f oldCenter = bone.getLocalTranslation();
-        
         float[] center = {(p1[0] + p2[0]) / 2f, (p1[1] + p2[1]) / 2f, (p1[2] + p2[2]) / 2f};
         bone.setLocalTranslation(center[0], center[1], center[2]);
-//        Vector3f newCenter = bone.getLocalTranslation();
-        
-//        Vector3f  difference = new Vector3f(newCenter.x-oldCenter.x,newCenter.y-oldCenter.y,newCenter.z-oldCenter.z);
-        
+
         List<Spatial> l = bone.getChildren();
         ListIterator<Spatial> i = l.listIterator();
         
         while(i.hasNext()){
             Spatial s = i.next();
-            //Node n = (Node) s;
             if(s.getName().equals("sticky")){
                 s.setLocalScale(1, 1, (float) 1./length);
-                
+                Vector3f tmp = s.getWorldTranslation();
+                s.setLocalTranslation(tmp.x-center[0],tmp.y-center[1],tmp.z-center[2]);
             }
         }
     }

@@ -45,6 +45,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
     private static Main main;
     private static AssetManager assetManager;
     
+    
     public static void addListener(Main main){
         InteractiveObject.main = main;
         assetManager = main.getAssetManager();
