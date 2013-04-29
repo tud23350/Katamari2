@@ -26,95 +26,97 @@ import com.jme3.scene.Spatial;
  *
  * @author Owner
  */
-public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickListener{
+public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickListener {
 
     Vector3f position;
-    
     //Geometry geom;
-    
     private Material mat;
     CollisionShape shape;
     RigidBodyControl rigidBody;
-    
+    Vector3f offset;
     Node parasiticNode;
     GhostControl ghost;
-    boolean kinematic=false;
-    
+    boolean kinematic = false;
     boolean removeSelf = false;
-    
     private static Main main;
     private static AssetManager assetManager;
-    
-    
-    public static void addListener(Main main){
+
+    public static void addListener(Main main) {
         InteractiveObject.main = main;
         assetManager = main.getAssetManager();
     }
-    
-    InteractiveObject(Geometry geom,Vector3f position) {
+
+    InteractiveObject(Geometry geom, Vector3f position) {
         this.position = position;
         parasiticNode = new Node();
-        
+
         //initialize box
         mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         mat.setColor("Color", ColorRGBA.White); // purple
-        
+
         geom.setMaterial(mat);
         geom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         geom.setCullHint(Spatial.CullHint.Never);
         parasiticNode.attachChild(geom);
-        
+
         //initialize physics
         shape = new HullCollisionShape(geom.getMesh());
         parasiticNode.setLocalTranslation(position);
         rigidBody = new RigidBodyControl(shape, 1f);
         rigidBody.setFriction(1f);
         rigidBody.setKinematic(kinematic);
- 
+
         ghost = new GhostControl(shape);
         parasiticNode.addControl(ghost);
         parasiticNode.addControl(rigidBody);
-        
+
         parasiticNode.setName("sticky");
-        
+
         main.bulletAppState.getPhysicsSpace().add(rigidBody);
         main.bulletAppState.getPhysicsSpace().add(ghost);
         main.bulletAppState.getPhysicsSpace().addCollisionListener(this);
         main.bulletAppState.getPhysicsSpace().addTickListener(this);
-        
+
         main.getRootNode().attachChild(parasiticNode);
     }
-    
-    public String toString(){
+
+    public String toString() {
         return "StickyObject";
     }
-    
+
     public void collision(PhysicsCollisionEvent event) {
-         Node a = (Node) event.getNodeA();
-         Node b = (Node) event.getNodeB();
-         
-         Node topLayerNode;
-         
-         if(a.getName().equals("physical") && b.equals(parasiticNode)){
-            System.out.println("Sticky object hit floor "+System.currentTimeMillis());
+        Node a = (Node) event.getNodeA();
+        Node b = (Node) event.getNodeB();
+
+        Node topLayerNode;
+
+        if (a.getName().equals("physical") && b.equals(parasiticNode)) {
+            System.out.println("Sticky object hit floor " + System.currentTimeMillis());
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
+            offset = new Vector3f();
+            offset.x = b.getWorldTranslation().x - a.getWorldTranslation().x;
+            offset.y = b.getWorldTranslation().y - a.getWorldTranslation().y;
+            offset.z = b.getWorldTranslation().z - a.getWorldTranslation().z;
             //topLayerNode = a.getParent();
-            b.attachChild(parasiticNode);
-            
+            a.attachChild(parasiticNode);
+
             removeSelf = true;
-            
-         }else if(b.getName().equals("physical") && a.equals(parasiticNode)){
-            System.out.println("Stick object hit floor "+System.currentTimeMillis()); 
+
+        } else if (b.getName().equals("physical") && a.equals(parasiticNode)) {
+            System.out.println("Stick object hit floor " + System.currentTimeMillis());
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
-            
+            offset = new Vector3f();
+            offset.x = b.getWorldTranslation().x - a.getWorldTranslation().x;
+            offset.y = b.getWorldTranslation().y - a.getWorldTranslation().y;
+            offset.z = b.getWorldTranslation().z - a.getWorldTranslation().z;
             //topLayerNode = b.getParent();
             b.attachChild(parasiticNode);
-            
+
             removeSelf = true;
-            
-         }
+
+        }
     }
 
     public void prePhysicsTick(PhysicsSpace space, float tpf) {
@@ -123,7 +125,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
 
     //removes any remaining listeners (otherwise it's exceptions/throws out the ass)
     public void physicsTick(PhysicsSpace space, float tpf) {
-        if(removeSelf){
+        if (removeSelf) {
             System.out.println("removing self");
             mat.setColor("Color", ColorRGBA.Red);
             main.bulletAppState.getPhysicsSpace().remove(ghost);
@@ -131,8 +133,6 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             main.bulletAppState.getPhysicsSpace().removeTickListener(this);
             removeSelf = false;
         }
-        
+
     }
-
-
 }

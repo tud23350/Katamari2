@@ -32,7 +32,7 @@ public class KinectSkeleton {
     KinematicObject[] boneObject = new KinematicObject[13];
     int [][] joint;
 
-    private final float scaleFactor = 800f;
+    private final float scaleFactor = 500f;
     
     private int[][] getJoints(){
         int [][]tmp;
@@ -177,8 +177,8 @@ public class KinectSkeleton {
             Spatial s = i.next();
             if(s.getName().equals("sticky")){
                 s.setLocalScale(1, 1, (float) 1./length);
-                Vector3f tmp = s.getWorldTranslation();
-                s.setLocalTranslation(tmp.x-center[0],tmp.y-center[1],tmp.z-center[2]);
+                
+                s.setLocalTranslation(0.4f,0,0);
             }
         }
     }
