@@ -48,6 +48,10 @@ public class Main extends SimpleApplication {
     Vector3f[] points;
     Vector4f[] colors;
     float clust_flag = 0;
+    
+    
+    //Scoring stuff
+    public int score = 0;
 
     public static void main(String[] args) {
         Main app = new Main();

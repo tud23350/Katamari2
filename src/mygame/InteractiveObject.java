@@ -126,6 +126,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
     //removes any remaining listeners (otherwise it's exceptions/throws out the ass)
     public void physicsTick(PhysicsSpace space, float tpf) {
         if (removeSelf) {
+            main.score++;//increase score
             System.out.println("removing self");
             mat.setColor("Color", ColorRGBA.Red);
             main.bulletAppState.getPhysicsSpace().remove(ghost);
