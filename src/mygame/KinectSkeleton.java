@@ -175,7 +175,7 @@ public class KinectSkeleton {
         
         while(i.hasNext()){
             Spatial s = i.next();
-            if(s.getName().equals("sticky")){
+            if(s.getName().equals("stuck")){
                 s.setLocalScale(1, 1, (float) 1./length);
                 //s.setLocalTranslation(0,0,0);
             }

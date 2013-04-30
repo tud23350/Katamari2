@@ -102,9 +102,9 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             parasiticNode.setLocalTranslation(offset.x,offset.y,offset.z);            
             //topLayerNode = a.getParent();
             a.attachChild(parasiticNode);
-
+            parasiticNode.setName("stuck");
             removeSelf = true;
-
+            main.score++;//increase score
         } else if (b.getName().equals("physical") && a.equals(parasiticNode)) {
             System.out.println("Stick object hit floor " + System.currentTimeMillis());
             rigidBody.setKinematic(true);
@@ -118,9 +118,19 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             //topLayerNode = b.getParent();
             b.attachChild(parasiticNode);
             System.out.println("Distance from object: "+Math.sqrt(offset.x*offset.x+offset.y*offset.y+offset.z*offset.z));
-
+            parasiticNode.setName("stuck");
             removeSelf = true;
-
+            main.score++;//increase score
+        }else if(a.getName().equals("stuck") && b.equals(parasiticNode)){
+            rigidBody.setKinematic(true);
+            main.getRootNode().detachChild(parasiticNode);
+            removeSelf = true;
+            main.score--;//increase score
+        }else if(b.getName().equals("stuck") && a.equals(parasiticNode)){
+            rigidBody.setKinematic(true);
+            main.getRootNode().detachChild(parasiticNode);
+            removeSelf = true;
+            main.score--;//increase score
         }
     }
 
@@ -131,7 +141,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
     //removes any remaining listeners (otherwise it's exceptions/throws out the ass)
     public void physicsTick(PhysicsSpace space, float tpf) {
         if (removeSelf) {
-            main.score++;//increase score
+            
             System.out.println("removing self");
             mat.setColor("Color", ColorRGBA.Red);
             main.bulletAppState.getPhysicsSpace().remove(ghost);
