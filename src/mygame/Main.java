@@ -340,7 +340,7 @@ public class Main extends SimpleApplication {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         bulletAppState.getPhysicsSpace().enableDebug(assetManager);
-        bulletAppState.getPhysicsSpace().setAccuracy(1f / 120f);
+        bulletAppState.getPhysicsSpace().setAccuracy(1f / 1000f);
     }
 
     private void initAudio() {

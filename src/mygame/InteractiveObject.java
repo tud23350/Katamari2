@@ -95,9 +95,11 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
             offset = new Vector3f();
-            offset.x = b.getWorldTranslation().x - a.getWorldTranslation().x;
-            offset.y = b.getWorldTranslation().y - a.getWorldTranslation().y;
-            offset.z = b.getWorldTranslation().z - a.getWorldTranslation().z;
+            offset.x = b.getWorldTranslation().x - parasiticNode.getWorldTranslation().x;
+            offset.y = b.getWorldTranslation().y - parasiticNode.getWorldTranslation().y;
+            offset.z = b.getWorldTranslation().z - parasiticNode.getWorldTranslation().z;
+            System.out.println("Distance from object: "+Math.sqrt(offset.x*offset.x+offset.y*offset.y+offset.z*offset.z));
+            parasiticNode.setLocalTranslation(offset.x,offset.y,offset.z);            
             //topLayerNode = a.getParent();
             a.attachChild(parasiticNode);
 
@@ -108,11 +110,14 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
             offset = new Vector3f();
-            offset.x = b.getWorldTranslation().x - a.getWorldTranslation().x;
-            offset.y = b.getWorldTranslation().y - a.getWorldTranslation().y;
-            offset.z = b.getWorldTranslation().z - a.getWorldTranslation().z;
+            offset.x = b.getWorldTranslation().x - parasiticNode.getWorldTranslation().x;
+            offset.y = b.getWorldTranslation().y - parasiticNode.getWorldTranslation().y;
+            offset.z = b.getWorldTranslation().z - parasiticNode.getWorldTranslation().z;
+            parasiticNode.setLocalTranslation(offset.x,offset.y,offset.z);
+
             //topLayerNode = b.getParent();
             b.attachChild(parasiticNode);
+            System.out.println("Distance from object: "+Math.sqrt(offset.x*offset.x+offset.y*offset.y+offset.z*offset.z));
 
             removeSelf = true;
 

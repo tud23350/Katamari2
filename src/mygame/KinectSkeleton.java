@@ -177,8 +177,7 @@ public class KinectSkeleton {
             Spatial s = i.next();
             if(s.getName().equals("sticky")){
                 s.setLocalScale(1, 1, (float) 1./length);
-                
-                s.setLocalTranslation(0.4f,0,0);
+                //s.setLocalTranslation(0,0,0);
             }
         }
     }
