@@ -95,9 +95,9 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
             rigidBody.setKinematic(true);
             main.getRootNode().detachChild(parasiticNode);
             offset = new Vector3f();
-            offset.x = b.getWorldTranslation().x - parasiticNode.getWorldTranslation().x;
-            offset.y = b.getWorldTranslation().y - parasiticNode.getWorldTranslation().y;
-            offset.z = b.getWorldTranslation().z - parasiticNode.getWorldTranslation().z;
+            offset.x = a.getWorldTranslation().x - parasiticNode.getWorldTranslation().x;
+            offset.y = a.getWorldTranslation().y - parasiticNode.getWorldTranslation().y;
+            offset.z = a.getWorldTranslation().z - parasiticNode.getWorldTranslation().z;
             System.out.println("Distance from object: "+Math.sqrt(offset.x*offset.x+offset.y*offset.y+offset.z*offset.z));
             parasiticNode.setLocalTranslation(offset.x,offset.y,offset.z);            
             //topLayerNode = a.getParent();

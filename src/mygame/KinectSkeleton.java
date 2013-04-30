@@ -144,8 +144,8 @@ public class KinectSkeleton {
             for (int i = 0; i <bones.length-1; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
                 bones[i] = boneObject[i].selfNode;
-                float heightScale = bones[i].getLocalScale().z;
-                boneObject[i].setShape(new Geometry("New Shape",new Cylinder(10, 10, 0.09f, 1f*heightScale, true)));
+                //float heightScale = bones[i].getLocalScale().z;
+                //boneObject[i].setShape(new Geometry("New Shape",new Cylinder(10, 10, 0.09f, 1f*heightScale, true)));
                 
             }
         } else {
