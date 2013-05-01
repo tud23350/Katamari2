@@ -81,7 +81,7 @@ public class KinectSkeleton {
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             //start loop to connect all joints
             System.out.println("Bone length: "+bones.length);
-            for (int i = 0; i < bones.length-1; i++) {
+            for (int i = 0; i < bones.length; i++) {
                 Cylinder c = new Cylinder(10, 10, 0.09f, 1f, true);
                 //new KinematicCylinder(new Geometry("Cylinder", c), Vector3f.ZERO);
                 //KinematicCylinder ko = new KinematicCylinder(c, Vector3f.ZERO);
@@ -141,7 +141,7 @@ public class KinectSkeleton {
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             
             System.out.println(bones.length);
-            for (int i = 0; i <bones.length-1; i++) {
+            for (int i = 0; i <bones.length; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
                 bones[i] = boneObject[i].selfNode;
                 //float heightScale = bones[i].getLocalScale().z;
