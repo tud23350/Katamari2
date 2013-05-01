@@ -10,6 +10,7 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
+import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
@@ -19,7 +20,9 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Box;
 import com.jme3.shadow.PssmShadowRenderer;
+import com.jme3.system.AppSettings;
 import com.jme3.util.BufferUtils;
+import de.lessvoid.nifty.Nifty;
 import java.util.LinkedList;
 import kinecttcpclient.KinectTCPClient;
 
@@ -38,7 +41,7 @@ public class Main extends SimpleApplication {
     KinectSkeleton kinectskeleton;
     Mocap moCap;
     //Gui stuff
-    gui mygui;
+    private MyStartScreen startScreen;
     Geometry geom;
     //RANSAC stuff
     KinectTCPClient kinect2;
@@ -48,13 +51,15 @@ public class Main extends SimpleApplication {
     Vector3f[] points;
     Vector4f[] colors;
     float clust_flag = 0;
-    
-    
     //Scoring stuff
     public int score = 0;
 
     public static void main(String[] args) {
+        AppSettings settings = new AppSettings(true);
+        settings.setResolution(640, 480);
         Main app = new Main();
+        app.setShowSettings(false); // splashscreen
+        app.setSettings(settings);
         app.start();
     }
 
@@ -79,65 +84,65 @@ public class Main extends SimpleApplication {
 
     @Override
     public void simpleInitApp() {
+        inputManager.setCursorVisible(true);
+        setDisplayFps(false);
+        setDisplayStatView(false);
+        startScreen = new MyStartScreen();
+        stateManager.attach(startScreen);
+
+        /**
+         * Åctivate the Nifty-JME integration:
+         */
+        NiftyJmeDisplay niftyDisplay = new NiftyJmeDisplay(
+                assetManager, inputManager, audioRenderer, guiViewPort);
+        Nifty nifty = niftyDisplay.getNifty();
+        guiViewPort.addProcessor(niftyDisplay);
+        nifty.fromXml("Interface/tutorial/screen3.xml", "start", startScreen);
+        //////////////////////////////////////////////////////////////////////
+
         initLighting();
         physicsInit();
-        //initAudio();
+        initAudio();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
         Inert.addListener(this);
 
-        kinect = new KinectTCPClient("localhost",8001);
-        if(kinect.sayHello()!= 214){
+        kinect = new KinectTCPClient("localhost", 8001);
+        if (kinect.sayHello() != 214) {
             kinect = null;
         }
 
         /*  Kinect stuff    */
         moCap = new Mocap();
-        mygui = new gui(this);
+
         //kinect = new KinectInterface(this);
         //kinect.getData();
         kinectskeleton = new KinectSkeleton(this);
 
 
 
-        Environment.create();
 
-        Box b = new Box(Vector3f.ZERO, 1, 1, 1);
-        Geometry geom = new Geometry("Box", b);
 
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.Blue);
-        geom.setMaterial(mat);
 
         //rootNode.attachChild(geom);
-        flyCam.setMoveSpeed(10);
+        //flyCam.setMoveSpeed(10);
+        flyCam.setDragToRotate(true);
     }
     //Here is a comment
 
     @Override
     public void simpleUpdate(float tpf) {
-        if (mygui.getchanged()) {
-            if ("Initalize Environment".equals(mygui.s)) {
-                Environment.create();
-                if (kinect != null) {
-                    kinect.readDepthXYZ();
-                }
-                mygui.resetchanged();
-            }
-            if ("Play Game".equals(mygui.s)) {
+        if (startScreen.snapshot == true || startScreen.startgame == true) {
+
+            if (startScreen.startgame == true) {
                 rootNode.detachAllChildren();
-                Box b = new Box(Vector3f.ZERO, 2, 2, 2);
-                geom = new Geometry("Box", b);
-
-                Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                mat.setColor("Color", ColorRGBA.Blue);
-                geom.setMaterial(mat);
-
-                rootNode.attachChild(geom);
-
+                Environment.create();
+                kinectskeleton = new KinectSkeleton(this);
+                startScreen.startgame = false;
+                
             }
-            if ("Take Picture".equals(mygui.s)) {
+            if (startScreen.snapshot == true) {
                 rootNode.detachAllChildren();
                 //RANSAC and Clustering Stuff
                 float[][] kinectPointCloud = getData();
@@ -182,22 +187,22 @@ public class Main extends SimpleApplication {
                     }
                 }
                 float max_dist = 20f;
-                for(int i=0;i<euclid_dis.length;i++){
-                    for(int j=i;j<euclid_dis[0].length;j++){
-                        if(euclid_dis[i][j] <= max_dist){
-                            if(outliers[i][3] == 0 && outliers[j][3] == 0){
+                for (int i = 0; i < euclid_dis.length; i++) {
+                    for (int j = i; j < euclid_dis[0].length; j++) {
+                        if (euclid_dis[i][j] <= max_dist) {
+                            if (outliers[i][3] == 0 && outliers[j][3] == 0) {
                                 clust_flag++;
                                 outliers[i][3] = clust_flag;
                                 outliers[j][3] = clust_flag;
-                            } else if(outliers[i][3] != 0 && outliers[j][3] == 0){
+                            } else if (outliers[i][3] != 0 && outliers[j][3] == 0) {
                                 outliers[j][3] = outliers[i][3];
-                            } else if(outliers[i][3] == 0 && outliers[j][3] != 0){
+                            } else if (outliers[i][3] == 0 && outliers[j][3] != 0) {
                                 outliers[i][3] = outliers[j][3];
                             }
                         }
                     }
                 }
-                
+
                 // create mesh
                 mesh = new Mesh();
                 mesh.setMode(Mesh.Mode.Points);
@@ -234,8 +239,9 @@ public class Main extends SimpleApplication {
                 Node pivot = new Node();
                 pivot.attachChild(geo);
                 rootNode.attachChild(pivot);
+                startScreen.snapshot = false;
             }
-            mygui.resetchanged();
+
         }
         if (geom != null) {
             geom.rotate(0, 0, 5f);
