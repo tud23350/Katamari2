@@ -25,7 +25,7 @@ public class Environment {
             testBox[i] = new TestBox( new Vector3f((i/n)*0.7f-2f,1f,(i%n)*0.7f+1), new Vector3f(0.2f, 0.2f, 0.2f));
             //testSphere[i] = new TestBox( new Vector3f((i/n)*3,3,(i%n)*3), new Vector3f(0.1f, 0.1f, 0.1f));//new InteractiveObject(new Geometry("Lulz",new Sphere(10, 10, 1f)), new Vector3f((i/n)*3,3,(i%n)*3));
         }
-        floor = new Inert(new Geometry("Lulz",new Box(2.5f,0.1f,2.5f)) , new Vector3f(0,-0.75f,0));
+        floor = new Inert(new Geometry("Lulz",new Box(2.5f,0.1f,2.5f)) , new Vector3f(0,-1.25f,2.5f));
     }
     
 }
