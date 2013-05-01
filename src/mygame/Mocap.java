@@ -91,7 +91,7 @@ public class Mocap extends Thread implements ActionListener {
         frameIterator = frames.iterator();
         state = PLAY;
         
-        load();
+        //load();
         state = PLAY;
         this.start();
     }

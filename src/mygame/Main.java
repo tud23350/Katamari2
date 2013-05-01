@@ -69,7 +69,7 @@ public class Main extends SimpleApplication {
         if (kinect2.sayHello() != 214) {
             kinect2 = null;
         } else {
-            //kinect.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZINDEX);
+            //kinect2.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZINDEX);
             kinect2.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZFULL); // important!
             dummyData = kinect2.readDepthXYZ();
         }
@@ -102,7 +102,7 @@ public class Main extends SimpleApplication {
 
         initLighting();
         physicsInit();
-        initAudio();
+        //initAudio();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
@@ -143,6 +143,7 @@ public class Main extends SimpleApplication {
                 
             }
             if (startScreen.snapshot == true) {
+                double start_time = System.currentTimeMillis();
                 rootNode.detachAllChildren();
                 //RANSAC and Clustering Stuff
                 float[][] kinectPointCloud = getData();
@@ -203,6 +204,68 @@ public class Main extends SimpleApplication {
                     }
                 }
 
+                float[][][] clusters = new float[(int) clust_flag][outliers.length][outliers[0].length];
+                for (int i = 0; i < clust_flag; i++) {
+                    k = 0;
+                    for (float[] a : outliers) {
+                        if (a[3] == i) {
+                            clusters[i][k][0] = a[0];
+                            clusters[i][k][1] = a[1];
+                            clusters[i][k][2] = a[2];
+                            k++;
+                        }
+                    }
+                }
+
+                float min_X = (float) Double.POSITIVE_INFINITY;
+                float max_X = (float) Double.NEGATIVE_INFINITY;
+                float min_Y = (float) Double.POSITIVE_INFINITY;
+                float max_Y = (float) Double.NEGATIVE_INFINITY;
+                float min_Z = (float) Double.POSITIVE_INFINITY;
+                float max_Z = (float) Double.NEGATIVE_INFINITY;
+                k = 0;
+                for (float[][] object : clusters) {
+                    for (float[] point : object) {
+                        if (point[0] < min_X) {
+                            min_X = point[0];
+                        }
+                        if (point[0] > max_X) {
+                            max_X = point[0];
+                        }
+                        if (point[1] < min_Y) {
+                            min_Y = point[1];
+                        }
+                        if (point[1] > max_Y) {
+                            min_Y = point[1];
+                        }
+                        if (point[2] < min_Z) {
+                            min_Z = point[2];
+                        }
+                        if (point[2] > max_Z) {
+                            max_Z = point[2];
+                        }
+
+                    }
+                    clusters[k][0][3] = min_X;
+                    clusters[k][1][3] = max_X;
+                    clusters[k][2][3] = min_Y;
+                    clusters[k][3][3] = max_Y;
+                    clusters[k][4][3] = min_Z;
+                    clusters[k][5][3] = max_Z;
+                    k++;
+                }
+
+                Box[] b = new Box[(int) clust_flag];
+                for (int t = 0; t < clust_flag; t++) {
+                    b[t] = new Box(Vector3f.ZERO, (clusters[t][1][3] - clusters[t][0][3]), (clusters[t][3][3] - clusters[t][2][3]), (clusters[t][5][3] - clusters[t][4][3]));
+                    geom = new Geometry("Box",b[t]);
+                    Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
+                    mat.setColor("Color", ColorRGBA.Blue);
+                    geom.setMaterial(mat);
+                    rootNode.attachChild(geom);
+                }
+                System.out.println("boxes created");
+                
                 // create mesh
                 mesh = new Mesh();
                 mesh.setMode(Mesh.Mode.Points);
@@ -221,12 +284,12 @@ public class Main extends SimpleApplication {
                 // colors
                 colors = new Vector4f[points.length];
                 for (int count = 0; count < colors.length; count++) {
-                    float r = (float) Math.random();
-                    float g = (float) Math.random();
-                    float b = (float) Math.random();
-                    colors[count] = new Vector4f(r, g, b, 1.0f);
+                    float r_c = (float) Math.random();
+                    float g_c = (float) Math.random();
+                    float b_c = (float) Math.random();
+                    colors[count] = new Vector4f(r_c, g_c, b_c, 1.0f);
                     //System.out.println(outliers[count][3]);
-                    //colors[count] = new Vector4f(outliers[count][3] * 6, outliers[count][3] * 6, outliers[count][3] * 6, 1.0f);
+                    //colors[count] = new Vector4f(outliers[count][3] / (float) (0.8*clust_flag), outliers[count][3] / (float) (0.8*clust_flag), outliers[count][3] / (float) (0.8*clust_flag), 1.0f);
                 }
                 mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
 
@@ -239,13 +302,15 @@ public class Main extends SimpleApplication {
                 Node pivot = new Node();
                 pivot.attachChild(geo);
                 rootNode.attachChild(pivot);
+                System.out.println("points should be created.");
                 startScreen.snapshot = false;
+                double end_time = System.currentTimeMillis();
+                System.out.println("time it takes to take picture:" + (end_time - start_time));
             }
-
         }
-        if (geom != null) {
-            geom.rotate(0, 0, 5f);
-        }
+//        if (geom != null) {
+//            geom.rotate(0, 0, 5f);
+//        }
         //kinect.getData();
         kinectskeleton.updateMovements();
 
