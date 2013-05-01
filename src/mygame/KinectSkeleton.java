@@ -80,7 +80,6 @@ public class KinectSkeleton {
                 {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             //start loop to connect all joints
-            System.out.println("Bone length: "+bones.length);
             for (int i = 0; i < bones.length; i++) {
                 Cylinder c = new Cylinder(10, 10, 0.09f, 1f, true);
                 //new KinematicCylinder(new Geometry("Cylinder", c), Vector3f.ZERO);
@@ -98,7 +97,7 @@ public class KinectSkeleton {
             
             madeSkeleton = true;
         }else{
-            System.out.println("Bone length: "+bones.length);
+
         }
 
     }
