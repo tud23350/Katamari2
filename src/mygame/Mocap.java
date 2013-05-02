@@ -91,7 +91,7 @@ public class Mocap extends Thread implements ActionListener {
         frameIterator = frames.iterator();
         state = PLAY;
         
-        //load();
+        load();
         state = PLAY;
         this.start();
     }
@@ -218,6 +218,7 @@ public class Mocap extends Thread implements ActionListener {
             frames = (LinkedList<int[][]>) in.readObject();
             in.close();
             fileIn.close();
+            System.out.println("MoCap: file loaded");
         } catch (Exception ex) {
             System.out.println("trouble");
         }

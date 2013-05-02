@@ -139,7 +139,6 @@ public class KinectSkeleton {
                 {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
             
-            System.out.println(bones.length);
             for (int i = 0; i <bones.length; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
                 bones[i] = boneObject[i].selfNode;
