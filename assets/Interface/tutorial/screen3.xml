@@ -64,4 +64,8 @@
       </panel>
     </layer>
   </screen>
+  
+  <screen id="empty"> 
+  </screen>
+  
 </nifty>

@@ -24,6 +24,8 @@ import com.jme3.system.AppSettings;
 import com.jme3.util.BufferUtils;
 import de.lessvoid.nifty.Nifty;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import kinecttcpclient.KinectTCPClient;
 
 /**
@@ -85,8 +87,10 @@ public class Main extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         inputManager.setCursorVisible(true);
-        setDisplayFps(false);
+        setDisplayFps(true);
         setDisplayStatView(false);
+        Logger.getAnonymousLogger().getParent().setLevel(Level.SEVERE);
+        Logger.getLogger("de.lessvoid.nifty.*").setLevel(Level.SEVERE);
         startScreen = new MyStartScreen();
         stateManager.attach(startScreen);
 
@@ -120,11 +124,6 @@ public class Main extends SimpleApplication {
         //kinect.getData();
         kinectskeleton = new KinectSkeleton(this);
 
-
-
-
-
-
         //rootNode.attachChild(geom);
         //flyCam.setMoveSpeed(10);
         flyCam.setDragToRotate(true);
@@ -140,7 +139,8 @@ public class Main extends SimpleApplication {
                 Environment.create();
                 kinectskeleton = new KinectSkeleton(this);
                 startScreen.startgame = false;
-                
+                startScreen.closeNifty(); //switches to an empty </screen> with nothing happening.
+
             }
             if (startScreen.snapshot == true) {
                 double start_time = System.currentTimeMillis();
@@ -187,7 +187,7 @@ public class Main extends SimpleApplication {
                                 + (outliers[i][2] - outliers[j][2]) * (outliers[i][2] - outliers[j][2])));
                     }
                 }
-                float max_dist = 20f;
+                float max_dist = 40f;
                 for (int i = 0; i < euclid_dis.length; i++) {
                     for (int j = i; j < euclid_dis[0].length; j++) {
                         if (euclid_dis[i][j] <= max_dist) {
@@ -217,14 +217,14 @@ public class Main extends SimpleApplication {
                     }
                 }
 
-                float min_X = (float) Double.POSITIVE_INFINITY;
-                float max_X = (float) Double.NEGATIVE_INFINITY;
-                float min_Y = (float) Double.POSITIVE_INFINITY;
-                float max_Y = (float) Double.NEGATIVE_INFINITY;
-                float min_Z = (float) Double.POSITIVE_INFINITY;
-                float max_Z = (float) Double.NEGATIVE_INFINITY;
                 k = 0;
                 for (float[][] object : clusters) {
+                    float min_X = (float) Double.POSITIVE_INFINITY;
+                    float max_X = (float) Double.NEGATIVE_INFINITY;
+                    float min_Y = (float) Double.POSITIVE_INFINITY;
+                    float max_Y = (float) Double.NEGATIVE_INFINITY;
+                    float min_Z = (float) Double.POSITIVE_INFINITY;
+                    float max_Z = (float) Double.NEGATIVE_INFINITY;
                     for (float[] point : object) {
                         if (point[0] < min_X) {
                             min_X = point[0];
@@ -236,7 +236,7 @@ public class Main extends SimpleApplication {
                             min_Y = point[1];
                         }
                         if (point[1] > max_Y) {
-                            min_Y = point[1];
+                            max_Y = point[1];
                         }
                         if (point[2] < min_Z) {
                             min_Z = point[2];
@@ -257,15 +257,16 @@ public class Main extends SimpleApplication {
 
                 Box[] b = new Box[(int) clust_flag];
                 for (int t = 0; t < clust_flag; t++) {
-                    b[t] = new Box(Vector3f.ZERO, (clusters[t][1][3] - clusters[t][0][3]), (clusters[t][3][3] - clusters[t][2][3]), (clusters[t][5][3] - clusters[t][4][3]));
-                    geom = new Geometry("Box",b[t]);
-                    Material mat = new Material(assetManager,"Common/MatDefs/Misc/Unshaded.j3md");
+                    b[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
+                    //b[t] = new Box(new Vector3f(((clusters[t][1][3] + clusters[t][0][3]) / 500f),((clusters[t][3][3] + clusters[t][2][3]) / 500f),((clusters[t][5][3] + clusters[t][4][3]) / 15000f)),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
+                    geom = new Geometry("Box", b[t]);
+                    Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
                     mat.setColor("Color", ColorRGBA.Blue);
                     geom.setMaterial(mat);
                     rootNode.attachChild(geom);
                 }
                 System.out.println("boxes created");
-                
+
                 // create mesh
                 mesh = new Mesh();
                 mesh.setMode(Mesh.Mode.Points);
@@ -284,12 +285,12 @@ public class Main extends SimpleApplication {
                 // colors
                 colors = new Vector4f[points.length];
                 for (int count = 0; count < colors.length; count++) {
-                    float r_c = (float) Math.random();
-                    float g_c = (float) Math.random();
-                    float b_c = (float) Math.random();
-                    colors[count] = new Vector4f(r_c, g_c, b_c, 1.0f);
+                    //float r_c = (float) Math.random();
+                    //float g_c = (float) Math.random();
+                    //float b_c = (float) Math.random();
+                    //colors[count] = new Vector4f(r_c, g_c, b_c, 1.0f);
                     //System.out.println(outliers[count][3]);
-                    //colors[count] = new Vector4f(outliers[count][3] / (float) (0.8*clust_flag), outliers[count][3] / (float) (0.8*clust_flag), outliers[count][3] / (float) (0.8*clust_flag), 1.0f);
+                    colors[count] = new Vector4f(outliers[count][3] / (float) (clust_flag), outliers[count][3] / (float) (clust_flag), outliers[count][3] / (float) (clust_flag), 1.0f);
                 }
                 mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
 
@@ -308,9 +309,7 @@ public class Main extends SimpleApplication {
                 System.out.println("time it takes to take picture:" + (end_time - start_time));
             }
         }
-//        if (geom != null) {
-//            geom.rotate(0, 0, 5f);
-//        }
+
         //kinect.getData();
         kinectskeleton.updateMovements();
 

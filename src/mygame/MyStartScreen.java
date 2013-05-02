@@ -87,6 +87,10 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     }
 
     public void onEndScreen() {
-
+        
+    }
+    
+    public void closeNifty(){
+        nifty.gotoScreen("empty");
     }
 }
