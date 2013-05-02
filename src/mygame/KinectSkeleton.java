@@ -1,6 +1,5 @@
 package mygame;
 
-import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Matrix3f;
@@ -9,8 +8,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Cylinder;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import kinecttcpclient.KinectTCPClient;
@@ -141,10 +138,7 @@ public class KinectSkeleton {
             
             for (int i = 0; i <bones.length; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
-                bones[i] = boneObject[i].selfNode;
-                //float heightScale = bones[i].getLocalScale().z;
-                //boneObject[i].setShape(new Geometry("New Shape",new Cylinder(10, 10, 0.09f, 1f*heightScale, true)));
-                
+                bones[i] = boneObject[i].selfNode;                
             }
         } else {
             createSkeleton();
