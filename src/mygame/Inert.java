@@ -47,8 +47,6 @@ public class Inert{
         assetManager = main.getAssetManager();
     }
     
-
-    
     Inert(Geometry geom, Vector3f position) {
         this.position = position;
         
