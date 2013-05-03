@@ -4,19 +4,14 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.material.Material;
-import com.jme3.material.RenderState;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.math.Vector4f;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
-import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.shape.Box;
 import com.jme3.shadow.PssmShadowRenderer;
@@ -57,6 +52,7 @@ public class Main extends SimpleApplication {
     Vector3f[] points;
     Vector4f[] colors;
     Box[] boxes;
+    InteractiveObject interBoxes[];
     //Scoring stuff
     public int score = 0;
 
@@ -152,6 +148,7 @@ public class Main extends SimpleApplication {
         //rootNode.attachChild(SkyFactory.createSky(assetManager, "/skysphere.jpg", true));
 
         flyCam.setDragToRotate(true);
+        flyCam.setMoveSpeed(50);
     }
     //Here is a comment
 
@@ -160,7 +157,7 @@ public class Main extends SimpleApplication {
         if (startScreen.snapshot == true || startScreen.startgame == true) {
 
             if (startScreen.startgame == true) {
-                rootNode.detachAllChildren();
+                //rootNode.detachAllChildren();
                 Environment.create();
                 kinectskeleton = new KinectSkeleton(this);
                 startScreen.startgame = false;
@@ -186,14 +183,25 @@ public class Main extends SimpleApplication {
                     clusters = cluster.clustering();
 
                     boxes = new Box[(int) cluster.clust_flag];
+                    interBoxes = new InteractiveObject[(int) cluster.clust_flag];
                     for (int t = 0; t < cluster.clust_flag; t++) {
-                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f), ((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
+                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),
+                                            ((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
+                                            ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
+                                            ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
+                        Vector3f center = new Vector3f(clusters[t][0][3] / 100f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
+                        Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
+                                                      ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
+                                                        ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
                         //b[t] = new Box(new Vector3f(((clusters[t][1][3] + clusters[t][0][3]) / 500f),((clusters[t][3][3] + clusters[t][2][3]) / 500f),((clusters[t][5][3] + clusters[t][4][3]) / 15000f)),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
                         geom = new Geometry("Box", boxes[t]);
-                        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                        mat.setColor("Color", ColorRGBA.Blue);
-                        geom.setMaterial(mat);
-                        rootNode.attachChild(geom);
+                        interBoxes[t] = new TestBox(center, size);
+                        System.out.println("center "+t+": ("+center.x+", "+center.y+", "+center.z+")");
+                        System.out.println("Adding Box: "+t);
+                        //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+                        //mat.setColor("Color", ColorRGBA.Blue);
+                        //geom.setMaterial(mat);
+                        //rootNode.attachChild(geom);
                     }
 
                     // create mesh
@@ -229,6 +237,7 @@ public class Main extends SimpleApplication {
                     rootNode.attachChild(pivot);
 
                     startScreen.snapshot = false;
+                    startScreen.startgame = true;
                     double end_time = System.currentTimeMillis();
                     System.out.println("time it takes to take picture:" + (end_time - start_time));
                 } catch (FileNotFoundException ex) {
