@@ -33,6 +33,7 @@ public class Environment {
             tiles[i] = new Inert(new Geometry("Lulz",new Box(2.5f,0.1f,2.5f)) , new Vector3f(5f*(i%n)-xOffset,-1.25f,2.5f+i/5*5f-zOffset),color);
         }
         //floor = new Inert(new Geometry("Lulz",new Box(2.5f,0.1f,2.5f)) , new Vector3f(0,-1.25f,2.5f));
+    
     }
     
 }
