@@ -133,7 +133,7 @@ public class Main extends SimpleApplication {
 
         initLighting();
         physicsInit();
-        //initAudio();
+        initAudio();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
@@ -283,7 +283,7 @@ public class Main extends SimpleApplication {
     }
 
     private void initAudio() {
-        AudioNode game_music = new AudioNode(assetManager, "prime.ogg", false);
+        AudioNode game_music = new AudioNode(assetManager, "Sounds/prime.ogg", false);
         game_music.setLooping(true);  // activate continuous playing
         game_music.setPositional(true);
         game_music.setLocalTranslation(Vector3f.ZERO.clone());
