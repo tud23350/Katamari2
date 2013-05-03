@@ -14,7 +14,7 @@ import com.jme3.scene.shape.Box;
  * @author Owner
  */
 public class Environment {
-    
+
     private static InteractiveObject testBox[], testSphere[];
     private static Inert floor;
     private static Inert tiles[];
@@ -35,5 +35,13 @@ public class Environment {
         //floor = new Inert(new Geometry("Lulz",new Box(2.5f,0.1f,2.5f)) , new Vector3f(0,-1.25f,2.5f));
     
     }
-    
+
+    public static void create(float[][][] clusters) {
+        int n = 5;
+        testBox = new TestBox[clusters.length];
+        for (int i = 0; i < clusters.length; i++) {
+            testBox[i] = new TestBox(new Vector3f((i / n) * 0.7f - 2f, 1f, (i % n) * 0.7f + 1), new Vector3f(0.2f, 0.2f, 0.2f));
+        }
+        floor = new Inert(new Geometry("Lulz", new Box(2.5f, 0.1f, 2.5f)), new Vector3f(0, -1.25f, 2.5f));
+    }
 }

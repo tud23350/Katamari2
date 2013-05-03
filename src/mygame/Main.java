@@ -182,9 +182,15 @@ public class Main extends SimpleApplication {
                     float[][][] clusters;
                     clusters = cluster.clustering();
                     
+
                     //boxes = new Box[(int) cluster.clust_flag];
                     
                     interBoxes = new InteractiveObject[(int) cluster.clust_flag];
+
+                    Environment.create(clusters);
+
+                    boxes = new Box[(int) cluster.clust_flag];
+
                     for (int t = 0; t < cluster.clust_flag; t++) {
 //                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),
 //                                            ((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
