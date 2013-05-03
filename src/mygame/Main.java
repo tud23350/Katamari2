@@ -184,6 +184,8 @@ public class Main extends SimpleApplication {
                     Cluster cluster = new Cluster(kinectPointCloud);
                     float[][][] clusters;
                     clusters = cluster.clustering();
+                    
+                    Environment.create(clusters);
 
                     boxes = new Box[(int) cluster.clust_flag];
                     for (int t = 0; t < cluster.clust_flag; t++) {
