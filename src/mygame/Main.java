@@ -187,7 +187,7 @@ public class Main extends SimpleApplication {
                     
                     interBoxes = new InteractiveObject[(int) cluster.clust_flag];
 
-                    Environment.create(clusters);
+                    //Environment.create(clusters);
 
                     boxes = new Box[(int) cluster.clust_flag];
 
