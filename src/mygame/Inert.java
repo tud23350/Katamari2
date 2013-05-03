@@ -47,6 +47,8 @@ public class Inert{
         assetManager = main.getAssetManager();
     }
     
+    
+    
     Inert(Geometry geom, Vector3f position) {
         this.position = position;
         
@@ -86,6 +88,11 @@ public class Inert{
         main.getRootNode().attachChild(topLayerNode);
     }
     
+    Inert(Geometry geom, Vector3f position, ColorRGBA color){
+        this(geom, position);
+        mat.setColor("Color", color); // purple
+    }
+    
     public String toString(){
         return "InertObject";
     }
@@ -93,5 +100,7 @@ public class Inert{
     public void collision(PhysicsCollisionEvent event) {
         
     }
+
+    
 
 }

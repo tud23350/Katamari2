@@ -181,20 +181,21 @@ public class Main extends SimpleApplication {
                     Cluster cluster = new Cluster(kinectPointCloud);
                     float[][][] clusters;
                     clusters = cluster.clustering();
-
-                    boxes = new Box[(int) cluster.clust_flag];
+                    
+                    //boxes = new Box[(int) cluster.clust_flag];
+                    
                     interBoxes = new InteractiveObject[(int) cluster.clust_flag];
                     for (int t = 0; t < cluster.clust_flag; t++) {
-                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),
-                                            ((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
-                                            ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
-                                            ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
+//                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),
+//                                            ((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
+//                                            ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
+//                                            ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
                         Vector3f center = new Vector3f(clusters[t][0][3] / 100f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
                         Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
                                                       ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
                                                         ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
                         //b[t] = new Box(new Vector3f(((clusters[t][1][3] + clusters[t][0][3]) / 500f),((clusters[t][3][3] + clusters[t][2][3]) / 500f),((clusters[t][5][3] + clusters[t][4][3]) / 15000f)),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
-                        geom = new Geometry("Box", boxes[t]);
+                        //geom = new Geometry("Box", boxes[t]);
                         interBoxes[t] = new TestBox(center, size);
                         System.out.println("center "+t+": ("+center.x+", "+center.y+", "+center.z+")");
                         System.out.println("Adding Box: "+t);
