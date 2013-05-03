@@ -23,6 +23,11 @@ import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.util.BufferUtils;
 import de.lessvoid.nifty.Nifty;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import kinecttcpclient.KinectTCPClient;
@@ -64,21 +69,44 @@ public class Main extends SimpleApplication {
         app.start();
     }
 
-    public float[][] getData() {
+    public float[][] getData() throws FileNotFoundException, IOException {
+        float[][] kinectPointCloud = null;
         kinect2 = new KinectTCPClient("localhost", 8001);
-        int[][] dummyData = null;
         if (kinect2.sayHello() != 214) {
-            kinect2 = null;
+            System.out.println("no kinect found");
+            FileInputStream fis = new FileInputStream("Kinect_Data/pointCloudBottles.txt");
+            Scanner fileInput = new Scanner(fis);
+            LinkedList<float[]> textData = new LinkedList<float[]>();
+            while (fileInput.hasNextFloat()) {
+                float[] point = new float[3];
+                point[0] = fileInput.nextFloat();
+                point[1] = fileInput.nextFloat();
+                point[2] = fileInput.nextFloat();
+                textData.add(point);
+            }
+            fis.close();
+            fileInput.close();
+            kinectPointCloud = new float[textData.size()][3];
+            int i = 0;
+            for (float[] a : textData) {
+                kinectPointCloud[i][0] = a[0];
+                kinectPointCloud[i][1] = a[1];
+                kinectPointCloud[i][2] = a[2];
+                i++;
+            }
         } else {
-            //kinect2.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZINDEX);
+            System.out.println("found kinect");
+            int[][] dummyData = null;
+            //kinect_picture.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZINDEX);
             kinect2.sendCommand(KinectTCPClient.CMD_DISABLEDEPTHXYZFULL); // important!
             dummyData = kinect2.readDepthXYZ();
-        }
-        float[][] kinectPointCloud = new float[dummyData.length][dummyData[0].length];
-        for (int a = 0; a < dummyData.length; a++) {
-            for (int b = 0; b < dummyData[0].length; b++) {
-                kinectPointCloud[a][b] = (float) dummyData[a][b];
+            kinectPointCloud = new float[dummyData.length][dummyData[0].length];
+            for (int a = 0; a < dummyData.length; a++) {
+                for (int b = 0; b < dummyData[0].length; b++) {
+                    kinectPointCloud[a][b] = (float) dummyData[a][b];
+                }
             }
+
         }
         return kinectPointCloud;
     }
@@ -140,68 +168,74 @@ public class Main extends SimpleApplication {
 
             }
             if (startScreen.snapshot == true) {
-                double start_time = System.currentTimeMillis();
-                rootNode.detachAllChildren();
-                //RANSAC and Clustering Stuff
-                float[][] kinectPointCloud = getData();
+                try {
+                    double start_time = System.currentTimeMillis();
+                    rootNode.detachAllChildren();
+                    //RANSAC and Clustering Stuff
+                    float[][] kinectPointCloud = getData();
 
-                //do RANSAC -----------------------------------------------
-                float noiseFactor = 50f; // noise of inliers
-                int numberOfIterations = 10;
-                float[] floor = RANSAC.detectPlane(kinectPointCloud, noiseFactor, numberOfIterations, (int) (kinectPointCloud.length * 0.8f));
-                //remove floor and use flooding algorithm on remaining points to get objects
+                    //do RANSAC -----------------------------------------------
+                    float noiseFactor = 50f; // noise of inliers
+                    int numberOfIterations = 10;
+                    float[] floor = RANSAC.detectPlane(kinectPointCloud, noiseFactor, numberOfIterations, (int) (kinectPointCloud.length * 0.8f));
+                    //remove floor and use flooding algorithm on remaining points to get objects
 
-                // visualize result
-                Cluster cluster = new Cluster(kinectPointCloud);
-                float [][][] clusters;
-                clusters = cluster.clustering();
+                    // visualize result
+                    Cluster cluster = new Cluster(kinectPointCloud);
+                    float[][][] clusters;
+                    clusters = cluster.clustering();
 
-                boxes = new Box[(int) cluster.clust_flag];
-                for (int t = 0; t < cluster.clust_flag; t++) {
-                    boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
-                    //b[t] = new Box(new Vector3f(((clusters[t][1][3] + clusters[t][0][3]) / 500f),((clusters[t][3][3] + clusters[t][2][3]) / 500f),((clusters[t][5][3] + clusters[t][4][3]) / 15000f)),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
-                    geom = new Geometry("Box", boxes[t]);
-                    Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                    mat.setColor("Color", ColorRGBA.Blue);
-                    geom.setMaterial(mat);
-                    rootNode.attachChild(geom);
+                    boxes = new Box[(int) cluster.clust_flag];
+                    for (int t = 0; t < cluster.clust_flag; t++) {
+                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f), ((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
+                        //b[t] = new Box(new Vector3f(((clusters[t][1][3] + clusters[t][0][3]) / 500f),((clusters[t][3][3] + clusters[t][2][3]) / 500f),((clusters[t][5][3] + clusters[t][4][3]) / 15000f)),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
+                        geom = new Geometry("Box", boxes[t]);
+                        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+                        mat.setColor("Color", ColorRGBA.Blue);
+                        geom.setMaterial(mat);
+                        rootNode.attachChild(geom);
+                    }
+
+                    // create mesh
+                    mesh = new Mesh();
+                    mesh.setMode(Mesh.Mode.Points);
+                    mesh.setPointSize(2f);
+
+                    points = new Vector3f[cluster.outliers.length];
+                    float x, y, z;
+                    for (int i = 0; i < points.length; i++) {
+                        x = -cluster.outliers[i][0] / 1000f;
+                        y = -cluster.outliers[i][1] / 1000f;
+                        z = -cluster.outliers[i][2] / 1000f;
+                        points[i] = new Vector3f(x, y, z);
+                    }
+                    mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
+
+                    // colors
+                    colors = new Vector4f[points.length];
+                    for (int count = 0; count < colors.length; count++) {
+                        colors[count] = new Vector4f(cluster.outliers[count][3] / (float) (cluster.clust_flag), cluster.outliers[count][3] / (float) (cluster.clust_flag), cluster.outliers[count][3] / (float) (cluster.clust_flag), 1.0f);
+                    }
+                    mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
+
+                    // create geomtery etc.
+                    mesh.updateBound();
+                    geo = new Geometry("OurMesh", mesh);
+                    Material matPC = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+                    matPC.setBoolean("VertexColor", true);
+                    geo.setMaterial(matPC);
+                    Node pivot = new Node();
+                    pivot.attachChild(geo);
+                    rootNode.attachChild(pivot);
+
+                    startScreen.snapshot = false;
+                    double end_time = System.currentTimeMillis();
+                    System.out.println("time it takes to take picture:" + (end_time - start_time));
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
-
-                // create mesh
-                mesh = new Mesh();
-                mesh.setMode(Mesh.Mode.Points);
-                mesh.setPointSize(2f);
-
-                points = new Vector3f[cluster.outliers.length];
-                float x, y, z;
-                for (int i = 0; i < points.length; i++) {
-                    x = -cluster.outliers[i][0] / 1000f;
-                    y = -cluster.outliers[i][1] / 1000f;
-                    z = -cluster.outliers[i][2] / 1000f;
-                    points[i] = new Vector3f(x, y, z);
-                }
-                mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
-
-                // colors
-                colors = new Vector4f[points.length];
-                for (int count = 0; count < colors.length; count++) {
-                    colors[count] = new Vector4f(cluster.outliers[count][3] / (float) (cluster.clust_flag), cluster.outliers[count][3] / (float) (cluster.clust_flag), cluster.outliers[count][3] / (float) (cluster.clust_flag), 1.0f);
-                }
-                mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
-
-                // create geomtery etc.
-                mesh.updateBound();
-                geo = new Geometry("OurMesh", mesh);
-                Material matPC = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                matPC.setBoolean("VertexColor", true);
-                geo.setMaterial(matPC);
-                Node pivot = new Node();
-                pivot.attachChild(geo);
-                rootNode.attachChild(pivot);
-                
-                startScreen.snapshot = false;
-                double end_time = System.currentTimeMillis();
-                System.out.println("time it takes to take picture:" + (end_time - start_time));
             }
         }
         kinectskeleton.updateMovements();
