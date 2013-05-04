@@ -64,6 +64,9 @@ public class Main extends SimpleApplication implements Runnable{
     private boolean timesUp = false;
     private long startTime;
     private long timeLimit = 1*20*1000; //in milliseconds
+    private final long timerInc = 32;
+    private final int spawnRate = 5;//spawns 1 box every 5 seconds
+    private float timeCounter=0;
     BitmapText Time;
     Thread timerThread;
     
@@ -180,6 +183,7 @@ public class Main extends SimpleApplication implements Runnable{
                 startScreen.closeNifty(); //switches to an empty </screen> with nothing happening.
                 initTimer();
                 initScore();
+                
             }
             else if (startScreen.snapshot == true) {
                 try {
@@ -229,6 +233,9 @@ public class Main extends SimpleApplication implements Runnable{
             }
         }
         kinectskeleton.updateMovements();
+        spawnBox(tpf);
+        
+        
     }
 
     // Point Geometry ---------------------------------------------
@@ -325,6 +332,14 @@ public class Main extends SimpleApplication implements Runnable{
         }
     }
     
+    private void spawnBox(float dt){
+        timeCounter+=dt;
+            if(timeCounter>=5){
+                Environment.createRandomBox(Vector3f.ZERO, 1f, 4f);
+                timeCounter=0;
+            }
+    }
+    
     private String formatTime(long t){
         String s = "";
         String tenths = Long.toString((t/100)%10);
@@ -347,7 +362,7 @@ public class Main extends SimpleApplication implements Runnable{
             updateScore();
             
             try {
-                timerThread.sleep(32);//cannot be divisable by 5 or 10
+                timerThread.sleep(timerInc);//cannot be divisable by 5 or 10
             } catch (InterruptedException ex) {
                 Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
             }
