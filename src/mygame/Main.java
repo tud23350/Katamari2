@@ -159,12 +159,15 @@ public class Main extends SimpleApplication {
             if (startScreen.startgame == true) {
                 //rootNode.detachAllChildren();
                 Environment.create();
-                //kinectskeleton = new KinectSkeleton(this);
+                if(startScreen.snapshot==true){
+                    kinectskeleton = new KinectSkeleton(this);
+                    startScreen.snapshot=false;
+                }
                 startScreen.startgame = false;
                 startScreen.closeNifty(); //switches to an empty </screen> with nothing happening.
 
             }
-            if (startScreen.snapshot == true) {
+            else if (startScreen.snapshot == true) {
                 try {
                     double start_time = System.currentTimeMillis();
                     rootNode.detachAllChildren();
@@ -200,7 +203,7 @@ public class Main extends SimpleApplication {
                         System.out.println("center " + t + ": (" + center.x + ", " + center.y + ", " + center.z + ")");
                         System.out.println("Adding Box: " + t);
                     }
-                    startScreen.snapshot = false;
+                    //startScreen.snapshot = false;
                     startScreen.startgame = true;
                     double end_time = System.currentTimeMillis();
                     System.out.println("time it takes to take picture:" + (end_time - start_time));
