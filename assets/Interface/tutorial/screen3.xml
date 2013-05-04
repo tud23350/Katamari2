@@ -11,6 +11,16 @@
   <!-- is dynamically defined, using the MyStartScreen controller.        -->
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   
+  
+  <screen id="empty"> 
+  </screen>
+  
+  <screen id="loading">
+      <layer id="foreground" childLayout="center">
+          <image filename="Interface/tutorial/loading_screen.png"></image>
+      </layer>
+  </screen>
+  
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
   <!-- lay out the start screen/layers/panels -->
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
@@ -63,9 +73,6 @@
         </panel>
       </panel>
     </layer>
-  </screen>
-  
-  <screen id="empty"> 
   </screen>
   
 </nifty>

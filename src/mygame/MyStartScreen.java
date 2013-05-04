@@ -20,9 +20,10 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     boolean snapshot = false;
     boolean startgame = false;
     boolean snapshottext=false;
+    boolean loadingGame = false;
 
     /**
-     * custom methods
+     * custom 
      */
     public MyStartScreen() {
         /**
@@ -34,6 +35,11 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
         nifty.gotoScreen(nextScreen);  // switch to another screen
         startgame=true;
     }
+    
+//    public void loading() {
+//        nifty.gotoScreen("loading");
+//        loadingGame = true;        
+//    }
 
     public void snapshot() {
         snapshot=true;

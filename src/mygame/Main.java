@@ -181,10 +181,10 @@ public class Main extends SimpleApplication {
                     Cluster cluster = new Cluster(kinectPointCloud);
                     float[][][] clusters;
                     clusters = cluster.clustering();
-                    
+
 
                     //boxes = new Box[(int) cluster.clust_flag];
-                    
+
                     interBoxes = new InteractiveObject[(int) cluster.clust_flag];
 
                     //Environment.create(clusters);
@@ -192,57 +192,14 @@ public class Main extends SimpleApplication {
                     boxes = new Box[(int) cluster.clust_flag];
 
                     for (int t = 0; t < cluster.clust_flag; t++) {
-//                        boxes[t] = new Box(new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f),
-//                                            ((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
-//                                            ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
-//                                            ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
                         Vector3f center = new Vector3f(clusters[t][0][3] / 100f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
                         Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
-                                                      ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
-                                                        ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
-                        //b[t] = new Box(new Vector3f(((clusters[t][1][3] + clusters[t][0][3]) / 500f),((clusters[t][3][3] + clusters[t][2][3]) / 500f),((clusters[t][5][3] + clusters[t][4][3]) / 15000f)),((clusters[t][1][3] - clusters[t][0][3]) / 1000f), ((clusters[t][3][3] - clusters[t][2][3]) / 1000f), ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
-                        //geom = new Geometry("Box", boxes[t]);
+                                ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
+                                ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
                         interBoxes[t] = new TestBox(center, size);
-                        System.out.println("center "+t+": ("+center.x+", "+center.y+", "+center.z+")");
-                        System.out.println("Adding Box: "+t);
-                        //Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                        //mat.setColor("Color", ColorRGBA.Blue);
-                        //geom.setMaterial(mat);
-                        //rootNode.attachChild(geom);
+                        System.out.println("center " + t + ": (" + center.x + ", " + center.y + ", " + center.z + ")");
+                        System.out.println("Adding Box: " + t);
                     }
-
-                    // create mesh
-                    mesh = new Mesh();
-                    mesh.setMode(Mesh.Mode.Points);
-                    mesh.setPointSize(2f);
-
-                    points = new Vector3f[cluster.outliers.length];
-                    float x, y, z;
-                    for (int i = 0; i < points.length; i++) {
-                        x = -cluster.outliers[i][0] / 1000f;
-                        y = -cluster.outliers[i][1] / 1000f;
-                        z = -cluster.outliers[i][2] / 1000f;
-                        points[i] = new Vector3f(x, y, z);
-                    }
-                    mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(points));
-
-                    // colors
-                    colors = new Vector4f[points.length];
-                    for (int count = 0; count < colors.length; count++) {
-                        colors[count] = new Vector4f(cluster.outliers[count][3] / (float) (cluster.clust_flag), cluster.outliers[count][3] / (float) (cluster.clust_flag), cluster.outliers[count][3] / (float) (cluster.clust_flag), 1.0f);
-                    }
-                    mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
-
-                    // create geomtery etc.
-                    mesh.updateBound();
-                    geo = new Geometry("OurMesh", mesh);
-                    Material matPC = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-                    matPC.setBoolean("VertexColor", true);
-                    geo.setMaterial(matPC);
-                    Node pivot = new Node();
-                    pivot.attachChild(geo);
-                    rootNode.attachChild(pivot);
-
                     startScreen.snapshot = false;
                     startScreen.startgame = true;
                     double end_time = System.currentTimeMillis();
