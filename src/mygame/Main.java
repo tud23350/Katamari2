@@ -3,6 +3,7 @@ package mygame;
 import com.jme3.app.SimpleApplication;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.font.BitmapText;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
@@ -32,7 +33,7 @@ import kinecttcpclient.KinectTCPClient;
  *
  * @author Mike Jake and Dave
  */
-public class Main extends SimpleApplication {
+public class Main extends SimpleApplication implements Runnable{
 
     //lightings and physics
     BulletAppState bulletAppState;
@@ -55,7 +56,16 @@ public class Main extends SimpleApplication {
     InteractiveObject interBoxes[];
     //Scoring stuff
     public int score = 0;
-
+    BitmapText scoreText;
+    
+    //Time Stuff
+    private boolean started = false;
+    private boolean timesUp = false;
+    private long startTime;
+    private long timeLimit = 1*20*1000; //in milliseconds
+    BitmapText Time;
+    Thread timerThread;
+    
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
         settings.setResolution(640, 480);
@@ -165,7 +175,8 @@ public class Main extends SimpleApplication {
                 }
                 startScreen.startgame = false;
                 startScreen.closeNifty(); //switches to an empty </screen> with nothing happening.
-
+                initTimer();
+                initScore();
             }
             else if (startScreen.snapshot == true) {
                 try {
@@ -266,5 +277,77 @@ public class Main extends SimpleApplication {
         game_music.setVolume(3);
         rootNode.attachChild(game_music);
         game_music.play(); // play continuously!
+    }
+    
+    private void initScore(){
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        scoreText = new BitmapText(guiFont, false);
+        scoreText.setSize(guiFont.getCharSet().getRenderedSize()+5);
+        scoreText.setText("Score: "+score);
+        scoreText.setLocalTranslation(0, 480, 0);
+        guiNode.attachChild(scoreText);
+    }
+    
+    private void updateScore(){
+        scoreText.setText("Score: "+score);
+    }
+    
+    private void initTimer(){
+        guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        Time = new BitmapText(guiFont, false);
+        Time.setSize(guiFont.getCharSet().getRenderedSize()+5);
+        Time.setText("Time: "+formatTime(timeLimit));
+        Time.setLocalTranslation(250, 480, 0);
+        guiNode.attachChild(Time);
+        started = true;
+        startTime = System.currentTimeMillis();
+        timerThread = new Thread(this);
+        timerThread.start();
+    }
+    
+    private void updateTimer(){
+        if(started){
+            long tmp = startTime+timeLimit-System.currentTimeMillis();
+            if(tmp>=0){
+                Time.setText("Time: "+formatTime(tmp));
+            }else{
+                timesUp = true;
+                Time.setText("Time: 0.00");
+            }
+            
+            if(tmp>9900 && tmp<10000){
+                Time.setColor(ColorRGBA.Red);
+            }
+            
+        }
+    }
+    
+    private String formatTime(long t){
+        String s = "";
+        String tenths = Long.toString((t/100)%10);
+        String hundredths = Long.toString((t/10)%10);
+        t = t/1000;
+        if(t/60>=1){
+            s = ((Long.toString(t/60)).concat(s)).concat(":").concat(Long.toString((t%60)/10)).concat(Long.toString((t%60)%10));
+        }else if(t >= 10){
+            s = s.concat(Long.toString((t%60)/10)).concat(Long.toString((t%60)%10)).concat(".").concat(tenths);
+        }else{
+            s = s.concat(Long.toString((t%60)%10)).concat(".").concat(tenths).concat(hundredths);
+        }
+        return s;
+    }
+
+    public void run() {
+        while(true){
+        
+            updateTimer();
+            updateScore();
+            
+            try {
+                timerThread.sleep(32);//cannot be divisable by 5 or 10
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }
