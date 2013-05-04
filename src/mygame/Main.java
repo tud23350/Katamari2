@@ -159,7 +159,7 @@ public class Main extends SimpleApplication {
             if (startScreen.startgame == true) {
                 //rootNode.detachAllChildren();
                 Environment.create();
-                kinectskeleton = new KinectSkeleton(this);
+                //kinectskeleton = new KinectSkeleton(this);
                 startScreen.startgame = false;
                 startScreen.closeNifty(); //switches to an empty </screen> with nothing happening.
 
