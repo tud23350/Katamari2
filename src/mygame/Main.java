@@ -18,6 +18,7 @@ import com.jme3.scene.shape.Box;
 import com.jme3.shadow.PssmShadowRenderer;
 import com.jme3.system.AppSettings;
 import com.jme3.util.BufferUtils;
+import com.jme3.util.SkyFactory;
 import de.lessvoid.nifty.Nifty;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -155,10 +156,12 @@ public class Main extends SimpleApplication implements Runnable{
         kinectskeleton = new KinectSkeleton(this);
 
         /* World */
-        //rootNode.attachChild(SkyFactory.createSky(assetManager, "/skysphere.jpg", true));
+        rootNode.attachChild(SkyFactory.createSky(assetManager, "/Mordor.jpg", true));
 
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(50);
+        cam.setLocation(new Vector3f(5f, 3f, 5f));
+        cam.lookAt(new Vector3f(-2f,-3f,0), new Vector3f(0f,3f,-5f));
     }
     //Here is a comment
 
