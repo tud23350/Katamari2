@@ -21,6 +21,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     boolean startgame = false;
     boolean snapshottext=false;
     boolean loadingGame = false;
+    boolean quitgame = false;
 
     /**
      * custom 
@@ -36,18 +37,20 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
         startgame=true;
     }
     
-//    public void loading() {
-//        nifty.gotoScreen("loading");
-//        loadingGame = true;        
-//    }
+    public void loading() {
+        nifty.gotoScreen("loading");
+        loadingGame = true;        
+    }
 
     public void snapshot() {
         snapshot=true;
         snapshottext=true;
+        //loadingGame=true;
     }
 
     public void quitGame() {
         app.stop();
+        quitgame = true;
     }
 
     public String getPlayerName() {
@@ -93,6 +96,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     }
 
     public void onEndScreen() {
+        //System.out.println("end!");
         
     }
     

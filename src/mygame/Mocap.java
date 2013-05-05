@@ -45,7 +45,6 @@ public class Mocap extends Thread implements ActionListener {
         windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JPanel southPanel = new JPanel();
         southPanel.setLayout(new GridLayout(1, 3));
-
         JButton stop = new JButton("Stop");
         stop.setActionCommand("stop");
         stop.addActionListener(this);

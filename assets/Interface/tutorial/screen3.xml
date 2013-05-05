@@ -15,12 +15,6 @@
   <screen id="empty"> 
   </screen>
   
-  <screen id="loading">
-      <layer id="foreground" childLayout="center">
-          <image filename="Interface/tutorial/loading_screen.png"></image>
-      </layer>
-  </screen>
-  
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
   <!-- lay out the start screen/layers/panels -->
   <!-- +++++++++++++++++++++++++++++++++++++++ -->
@@ -73,6 +67,15 @@
         </panel>
       </panel>
     </layer>
+  </screen>
+  
+  <screen id="loading" controller="mygame.MyStartScreen">
+      <layer id="background" childLayout="center">
+          <image fileName="Interface/tutorial/loading_screen.png"></image>
+      </layer>
+      <layer id="foreground" childLayout="center">
+          <image filename="Interface/tutorial/loading_screen.png"></image>
+      </layer>
   </screen>
   
 </nifty>

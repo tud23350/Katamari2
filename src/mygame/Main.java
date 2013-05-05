@@ -20,6 +20,7 @@ import com.jme3.system.AppSettings;
 import com.jme3.util.BufferUtils;
 import com.jme3.util.SkyFactory;
 import de.lessvoid.nifty.Nifty;
+import java.awt.BorderLayout;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -27,6 +28,8 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 import kinecttcpclient.KinectTCPClient;
 
 /**
@@ -34,7 +37,7 @@ import kinecttcpclient.KinectTCPClient;
  *
  * @author Mike Jake and Dave
  */
-public class Main extends SimpleApplication implements Runnable{
+public class Main extends SimpleApplication implements Runnable {
 
     //lightings and physics
     BulletAppState bulletAppState;
@@ -46,6 +49,7 @@ public class Main extends SimpleApplication implements Runnable{
     //Gui stuff
     private MyStartScreen startScreen;
     Geometry geom;
+    JFrame windowFrame;
     //RANSAC stuff
     KinectTCPClient kinect2;
     Node[] node;
@@ -58,18 +62,18 @@ public class Main extends SimpleApplication implements Runnable{
     //Scoring stuff
     public int score = 0;
     BitmapText scoreText;
-    
     //Time Stuff
+    private boolean mode = true;
     private boolean started = false;
     private boolean timesUp = false;
     private long startTime;
-    private long timeLimit = 1*20*1000; //in milliseconds
+    private long timeLimit = 1 * 20 * 1000; //in milliseconds
     private final long timerInc = 32;
     private final int spawnRate = 5;//spawns 1 box every 5 seconds
-    private float timeCounter=0;
+    private float timeCounter = 0;
     BitmapText Time;
     Thread timerThread;
-    
+
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
         settings.setResolution(640, 480);
@@ -164,7 +168,7 @@ public class Main extends SimpleApplication implements Runnable{
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(50);
         cam.setLocation(new Vector3f(5f, 3f, 5f));
-        cam.lookAt(new Vector3f(-2f,-3f,0), new Vector3f(0f,3f,-5f));
+        cam.lookAt(Vector3f.ZERO, new Vector3f(0f, 3f, -5f));
     }
     //Here is a comment
 
@@ -175,17 +179,15 @@ public class Main extends SimpleApplication implements Runnable{
             if (startScreen.startgame == true) {
                 //rootNode.detachAllChildren();
                 Environment.create();
-                if(startScreen.snapshot==true){
+                if (startScreen.snapshot == true) {
                     kinectskeleton = new KinectSkeleton(this);
-                    startScreen.snapshot=false;
+                    startScreen.snapshot = false;
                 }
                 startScreen.startgame = false;
                 startScreen.closeNifty(); //switches to an empty </screen> with nothing happening.
                 initTimer();
                 initScore();
-                
-            }
-            else if (startScreen.snapshot == true) {
+            } else if (startScreen.snapshot == true) {
                 try {
                     double start_time = System.currentTimeMillis();
                     rootNode.detachAllChildren();
@@ -224,6 +226,7 @@ public class Main extends SimpleApplication implements Runnable{
                     //startScreen.snapshot = false;
                     startScreen.startgame = true;
                     double end_time = System.currentTimeMillis();
+                    mode = false;
                     System.out.println("time it takes to take picture:" + (end_time - start_time));
                 } catch (FileNotFoundException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -233,9 +236,27 @@ public class Main extends SimpleApplication implements Runnable{
             }
         }
         kinectskeleton.updateMovements();
-        spawnBox(tpf);
-        
-        
+        //spawnBox(tpf);
+        if (mode == true) {
+            spawnBox(tpf);
+        }
+        if (startScreen.quitgame == true) {
+            windowFrame.repaint();
+
+        }
+
+    }
+
+    public void makeGUI(int score, int time) {
+        /* LeaderBoard GUI */
+        LeaderBoard lb = new LeaderBoard(300, 300, score, time);
+        windowFrame = new JFrame();
+        windowFrame.setLayout(new BorderLayout());
+        windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //JPanel set = new JPanel();
+        windowFrame.add(lb);
+        windowFrame.pack();
+        windowFrame.setVisible(true);
     }
 
     // Point Geometry ---------------------------------------------
@@ -288,25 +309,25 @@ public class Main extends SimpleApplication implements Runnable{
         rootNode.attachChild(game_music);
         game_music.play(); // play continuously!
     }
-    
-    private void initScore(){
+
+    private void initScore() {
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         scoreText = new BitmapText(guiFont, false);
-        scoreText.setSize(guiFont.getCharSet().getRenderedSize()+5);
-        scoreText.setText("Score: "+score);
+        scoreText.setSize(guiFont.getCharSet().getRenderedSize() + 5);
+        scoreText.setText("Score: " + score);
         scoreText.setLocalTranslation(0, 480, 0);
         guiNode.attachChild(scoreText);
     }
-    
-    private void updateScore(){
-        scoreText.setText("Score: "+score);
+
+    private void updateScore() {
+        scoreText.setText("Score: " + score);
     }
-    
-    private void initTimer(){
+
+    private void initTimer() {
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         Time = new BitmapText(guiFont, false);
-        Time.setSize(guiFont.getCharSet().getRenderedSize()+5);
-        Time.setText("Time: "+formatTime(timeLimit));
+        Time.setSize(guiFont.getCharSet().getRenderedSize() + 5);
+        Time.setText("Time: " + formatTime(timeLimit));
         Time.setLocalTranslation(250, 480, 0);
         guiNode.attachChild(Time);
         started = true;
@@ -314,53 +335,59 @@ public class Main extends SimpleApplication implements Runnable{
         timerThread = new Thread(this);
         timerThread.start();
     }
-    
-    private void updateTimer(){
-        if(started){
-            long tmp = startTime+timeLimit-System.currentTimeMillis();
-            if(tmp>=0){
-                Time.setText("Time: "+formatTime(tmp));
-            }else{
+
+    private void updateTimer() {
+        if (started) {
+            long tmp = startTime + timeLimit - System.currentTimeMillis();
+            if (tmp >= 0) {
+                Time.setText("Time: " + formatTime(tmp));
+            } else {
                 timesUp = true;
                 Time.setText("Time: 0.00");
             }
-            
-            if(tmp>9900 && tmp<10000){
+
+            if (tmp > 9900 && tmp < 10000) {
                 Time.setColor(ColorRGBA.Red);
             }
-            
+
         }
     }
-    
-    private void spawnBox(float dt){
-        timeCounter+=dt;
-            if(timeCounter>=5){
-                Environment.createRandomBox(Vector3f.ZERO, 1f, 4f);
-                timeCounter=0;
-            }
+
+    private void spawnBox(float dt) {
+        timeCounter += dt;
+        if (timeCounter >= 5) {
+            Environment.createRandomBox(Vector3f.ZERO, 1f, 4f);
+            timeCounter = 0;
+        }
     }
-    
-    private String formatTime(long t){
+
+    private String formatTime(long t) {
         String s = "";
-        String tenths = Long.toString((t/100)%10);
-        String hundredths = Long.toString((t/10)%10);
-        t = t/1000;
-        if(t/60>=1){
-            s = ((Long.toString(t/60)).concat(s)).concat(":").concat(Long.toString((t%60)/10)).concat(Long.toString((t%60)%10));
-        }else if(t >= 10){
-            s = s.concat(Long.toString((t%60)/10)).concat(Long.toString((t%60)%10)).concat(".").concat(tenths);
-        }else{
-            s = s.concat(Long.toString((t%60)%10)).concat(".").concat(tenths).concat(hundredths);
+        String tenths = Long.toString((t / 100) % 10);
+        String hundredths = Long.toString((t / 10) % 10);
+        t = t / 1000;
+        if (t / 60 >= 1) {
+            s = ((Long.toString(t / 60)).concat(s)).concat(":").concat(Long.toString((t % 60) / 10)).concat(Long.toString((t % 60) % 10));
+        } else if (t >= 10) {
+            s = s.concat(Long.toString((t % 60) / 10)).concat(Long.toString((t % 60) % 10)).concat(".").concat(tenths);
+        } else {
+            s = s.concat(Long.toString((t % 60) % 10)).concat(".").concat(tenths).concat(hundredths);
         }
         return s;
     }
 
     public void run() {
-        while(true){
-        
+        boolean run = true;
+        while (run) {
+
             updateTimer();
+            if (timesUp) {
+                makeGUI(score, 2);
+                startScreen.quitGame();
+                run = false;
+            }
             updateScore();
-            
+
             try {
                 timerThread.sleep(timerInc);//cannot be divisable by 5 or 10
             } catch (InterruptedException ex) {
