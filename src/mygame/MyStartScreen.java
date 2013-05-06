@@ -86,7 +86,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     public void update(float tpf) {
         
         if (snapshotcompleted && !gamestarted) {
-            Element niftyElement = nifty.getCurrentScreen().findElementByName("panel_top");
+            Element niftyElement = nifty.getCurrentScreen().findElementByName("status");
             niftyElement.getRenderer(TextRenderer.class).setText("Environment Created!");
         }
         
