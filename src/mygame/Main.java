@@ -148,7 +148,11 @@ public class Main extends SimpleApplication implements Runnable {
 
         initLighting();
         physicsInit();
-        //initAudio();
+        
+        //////////////////////////////////Added audio and sky back in
+        initAudio();
+        rootNode.attachChild(SkyFactory.createSky(assetManager, "sky/redsky.jpg", true));
+        //////////////////////////////////////////////////////////////
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);
