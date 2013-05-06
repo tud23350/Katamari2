@@ -56,24 +56,27 @@ public class LeaderBoardClassic extends JPanel {
         File data = new File("Kinect_Data/LeaderBoardClassic.txt");
         PrintWriter output = new PrintWriter(data);
         int place = rank.length;
+        boolean highscore = true;
         for (int i = 0; i < place; i++) {
             String name = "";
-            if (time >= Integer.parseInt(rank[i][2])) {
-                name = JOptionPane.showInputDialog(null, "HighScore!!");
-                if (i == 0) {
-                    for (int d = 0; d < rank[0].length; d++) {
-                        rank[i + 2][d] = rank[i + 1][d];
-                        rank[i + 1][d] = rank[i][d];
+            if (highscore) {
+                if (time >= Integer.parseInt(rank[i][2])) {
+                    name = JOptionPane.showInputDialog(null, "HighScore!!");
+                    if (i == 0) {
+                        for (int d = 0; d < rank[0].length; d++) {
+                            rank[i + 2][d] = rank[i + 1][d];
+                            rank[i + 1][d] = rank[i][d];
+                        }
+                    } else if (i == 1) {
+                        for (int d = 0; d < rank[0].length; d++) {
+                            rank[i + 1][d] = rank[i][d];
+                        }
                     }
-                } else if (i == 1) {
-                    for (int d = 0; d < rank[0].length; d++) {
-                        rank[i + 1][d] = rank[i][d];
-                    }
+                    rank[i][0] = name;
+                    rank[i][1] = Integer.toString(score);
+                    rank[i][2] = Long.toString(time);
+                    highscore = false;
                 }
-                rank[i][0] = name;
-                rank[i][1] = Integer.toString(score);
-                rank[i][2] = Long.toString(time);
-                score = (int) Double.NEGATIVE_INFINITY;
             }
             output.println(rank[i][0]); //name
             output.println(rank[i][1]); //Score
@@ -105,6 +108,5 @@ public class LeaderBoardClassic extends JPanel {
             g.drawChars(time, 0, time.length, 15, spacing + 20);
             g.drawChars(rank[j][2].toCharArray(), 0, rank[j][2].toCharArray().length, 18 + time.length * time.length, spacing += 20);
         }
-        System.out.println("LeaderBoard");
     }
 }

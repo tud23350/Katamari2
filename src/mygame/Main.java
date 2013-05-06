@@ -71,7 +71,7 @@ public class Main extends SimpleApplication implements Runnable {
     private boolean timesUp = false;
     private boolean countUp = false;
     private long startTime;
-    private long timeLimit = 1 * 20 * 1000; //in milliseconds
+    private long timeLimit = 1 * 26 * 1000; //in milliseconds
     private final long timerInc = 32;
     private final int spawnRate = 1;//spawns 1 box every 1 seconds
     private float timeCounter = 0;
@@ -134,7 +134,7 @@ public class Main extends SimpleApplication implements Runnable {
     @Override
     public void simpleInitApp() {
         inputManager.setCursorVisible(true);
-        setDisplayFps(true);
+        setDisplayFps(false);
         setDisplayStatView(false);
         Logger.getAnonymousLogger().getParent().setLevel(Level.SEVERE);
         Logger.getLogger("de.lessvoid.nifty.*").setLevel(Level.SEVERE);
@@ -175,7 +175,8 @@ public class Main extends SimpleApplication implements Runnable {
 
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(50);
-        cam.lookAt(Vector3f.ZERO, new Vector3f(0f, 20f, -25f));
+        cam.setLocation(new Vector3f(0f,-1f,20f));
+        cam.lookAt(new Vector3f(0f, 120f, -240f), new Vector3f(0f, 120f, -200f));
     }
 
     @Override
@@ -184,7 +185,6 @@ public class Main extends SimpleApplication implements Runnable {
 
             if (startScreen.startgame == true) {
                 Environment.create();
-                rootNode.attachChild(SkyFactory.createSky(assetManager, "sky/redsky.jpg", true));
                 if (startScreen.snapshot == true) {
                     kinectskeleton = new KinectSkeleton(this);
                     startScreen.snapshot = false;
@@ -313,7 +313,7 @@ public class Main extends SimpleApplication implements Runnable {
     private void physicsInit() {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        bulletAppState.getPhysicsSpace().setAccuracy(1f / 60f);
+        bulletAppState.getPhysicsSpace().setAccuracy(1f / 50f);
     }
 
     private void initAudio() {

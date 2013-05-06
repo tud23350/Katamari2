@@ -28,13 +28,13 @@
             </panel>
             <panel id="panel_bottom" height="25%" width="75%" align="center" childLayout="horizontal">  
                 <panel id="panel_bottom_left" height="50%" width="50%" valign="center" childLayout="center">  
-                    <control name="button" label="Snapshot" id="StartButton" align="center" valign="center" 
+                    <control name="button" label="Classic" id="StartButton" align="center" valign="center" 
                              visibleToMouse="true"> 
                         <interact onClick="snapshot()" />
                     </control>
                 </panel>
                 <panel id="panel_bottom_right" height="50%" width="50%" valign="center" childLayout="center">  
-                    <control name="button" label="StartGame" id="StartGame" align="center" valign="center" 
+                    <control name="button" label="Hectic" id="StartGame" align="center" valign="center" 
                              visibleToMouse="true" > 
                         <interact onClick="startGame(hud)"/>
                     </control>

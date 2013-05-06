@@ -46,8 +46,8 @@ public class Environment {
         float randAngle = FastMath.TWO_PI*FastMath.nextRandomFloat();
         float randDist = FastMath.nextRandomFloat()*(r2-r1)+r1;
         
-        Vector3f position = new Vector3f(center.x+randDist*FastMath.cos(randAngle), 
-                            center.y, center.z+randDist*FastMath.sin(randAngle));
+        Vector3f position = new Vector3f(center.x+randDist*FastMath.cos(randAngle)+1, 
+                            center.y, center.z+randDist*FastMath.sin(randAngle)+3);
         
          boxList.add( new TestBox(position, new Vector3f(0.2f, 0.2f, 0.2f)) );
     }

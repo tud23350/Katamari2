@@ -52,24 +52,27 @@ public class LeaderBoard extends JPanel {
         File data = new File("Kinect_Data/LeaderBoard.txt");
         PrintWriter output = new PrintWriter(data);
         int place = rank.length;
+        boolean highscore = true;
         for (int i = 0; i < place; i++) {
             String name = "";
-            if (score >= Integer.parseInt(rank[i][1])) {
-                name = JOptionPane.showInputDialog(null, "HighScore!!");
-                if (i == 0) {
-                    for (int d = 0; d < rank[0].length; d++) {
-                        rank[i + 2][d] = rank[i + 1][d];
-                        rank[i + 1][d] = rank[i][d];
+            if (highscore) {
+                if (score >= Integer.parseInt(rank[i][1])) {
+                    name = JOptionPane.showInputDialog(null, "HighScore!!");
+                    if (i == 0) {
+                        for (int d = 0; d < rank[0].length; d++) {
+                            rank[i + 2][d] = rank[i + 1][d];
+                            rank[i + 1][d] = rank[i][d];
+                        }
+                    } else if (i == 1) {
+                        for (int d = 0; d < rank[0].length; d++) {
+                            rank[i + 1][d] = rank[i][d];
+                        }
                     }
-                } else if (i == 1) {
-                    for (int d = 0; d < rank[0].length; d++) {
-                        rank[i + 1][d] = rank[i][d];
-                    }
+                    rank[i][0] = name;
+                    rank[i][1] = Integer.toString(score);
+                    rank[i][2] = Long.toString(time);
+                    highscore = false;
                 }
-                rank[i][0] = name;
-                rank[i][1] = Integer.toString(score);
-                rank[i][2] = Long.toString(time);
-                score = (int) Double.NEGATIVE_INFINITY;
             }
             output.println(rank[i][0]); //name
             output.println(rank[i][1]); //Score
