@@ -29,7 +29,7 @@ import com.jme3.scene.Spatial;
 public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickListener {
 
     Vector3f position;
-    //Geometry geom;
+    public boolean stuck = false;
     private Material mat;
     CollisionShape shape;
     RigidBodyControl rigidBody;
@@ -141,7 +141,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
     //removes any remaining listeners (otherwise it's exceptions/throws out the ass)
     public void physicsTick(PhysicsSpace space, float tpf) {
         if (removeSelf) {
-            
+            stuck = true;
             System.out.println("removing self");
             mat.setColor("Color", ColorRGBA.Red);
             main.bulletAppState.getPhysicsSpace().remove(ghost);

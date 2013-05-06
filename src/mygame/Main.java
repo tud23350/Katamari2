@@ -66,6 +66,7 @@ public class Main extends SimpleApplication implements Runnable {
     private boolean mode = true;
     private boolean started = false;
     private boolean timesUp = false;
+    private boolean countUp = false;
     private long startTime;
     private long timeLimit = 1 * 20 * 1000; //in milliseconds
     private final long timerInc = 32;
@@ -212,7 +213,7 @@ public class Main extends SimpleApplication implements Runnable {
 
                     //Environment.create(clusters);
 
-                    boxes = new Box[(int) cluster.clust_flag];
+                   // boxes = new Box[(int) cluster.clust_flag];
 
                     for (int t = 0; t < cluster.clust_flag; t++) {
                         Vector3f center = new Vector3f(clusters[t][0][3] / 100f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
@@ -239,6 +240,12 @@ public class Main extends SimpleApplication implements Runnable {
         //spawnBox(tpf);
         if (mode == true) {
             spawnBox(tpf);
+            countUp = false;
+        }else{
+            countUp = true;
+            if(allObjectsDestroyed()){
+                timesUp = true;
+            }
         }
         if (startScreen.quitgame == true) {
             windowFrame.repaint();
@@ -327,7 +334,11 @@ public class Main extends SimpleApplication implements Runnable {
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         Time = new BitmapText(guiFont, false);
         Time.setSize(guiFont.getCharSet().getRenderedSize() + 5);
-        Time.setText("Time: " + formatTime(timeLimit));
+        if(countUp){
+            Time.setText("Time: " + formatTime(0));
+        }else{
+            Time.setText("Time: " + formatTime(timeLimit));
+        }
         Time.setLocalTranslation(250, 480, 0);
         guiNode.attachChild(Time);
         started = true;
@@ -338,24 +349,40 @@ public class Main extends SimpleApplication implements Runnable {
 
     private void updateTimer() {
         if (started) {
-            long tmp = startTime + timeLimit - System.currentTimeMillis();
+            
+            long tmp;
+            if(countUp){
+                tmp =  System.currentTimeMillis() - startTime;
+            }else{
+                tmp = startTime + timeLimit - System.currentTimeMillis();
+            }
+            
             if (tmp >= 0) {
                 Time.setText("Time: " + formatTime(tmp));
             } else {
                 timesUp = true;
                 Time.setText("Time: 0.00");
             }
-
-            if (tmp > 9900 && tmp < 10000) {
-                Time.setColor(ColorRGBA.Red);
+            
+            if(countUp){
+                if (tmp < 10000) {
+                    Time.setColor(ColorRGBA.Green);
+                }else if(tmp>=10000 && tmp<120*1000){
+                    Time.setColor(ColorRGBA.White);
+                }else if(tmp>120*1000){
+                    Time.setColor(ColorRGBA.Red);
+                }
+            }else{
+                if (tmp > 9900 && tmp < 10000) {
+                    Time.setColor(ColorRGBA.Red);
+                }
             }
-
         }
     }
 
     private void spawnBox(float dt) {
         timeCounter += dt;
-        if (timeCounter >= 5) {
+        if (timeCounter >= spawnRate) {
             Environment.createRandomBox(Vector3f.ZERO, 1f, 4f);
             timeCounter = 0;
         }
@@ -395,4 +422,18 @@ public class Main extends SimpleApplication implements Runnable {
             }
         }
     }
+    
+    private boolean allObjectsDestroyed(){
+        if(interBoxes!=null){
+            for(int i =0;i < interBoxes.length; i++){
+                if(!interBoxes[i].removeSelf){
+                    return false;
+                }
+            }
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
 }
