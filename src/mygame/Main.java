@@ -46,6 +46,9 @@ public class Main extends SimpleApplication implements Runnable {
     KinectTCPClient kinect;
     KinectSkeleton kinectskeleton;
     Mocap moCap;
+    float[][] kinectPointCloud;
+    float[][][] clusters;
+    Cluster cluster;
     //Gui stuff
     private MyStartScreen startScreen;
     Geometry geom;
@@ -70,10 +73,12 @@ public class Main extends SimpleApplication implements Runnable {
     private long startTime;
     private long timeLimit = 1 * 20 * 1000; //in milliseconds
     private final long timerInc = 32;
-    private final int spawnRate = 5;//spawns 1 box every 5 seconds
+    private final int spawnRate = 1;//spawns 1 box every 1 seconds
     private float timeCounter = 0;
+    private float frameCount = 0;
     BitmapText Time;
     Thread timerThread;
+    long tmp;
 
     public static void main(String[] args) {
         AppSettings settings = new AppSettings(true);
@@ -148,10 +153,8 @@ public class Main extends SimpleApplication implements Runnable {
 
         initLighting();
         physicsInit();
-        
-        //////////////////////////////////Added audio back in
         initAudio();
-        
+
         //////////////////////////////////////////////////////////////
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
@@ -172,17 +175,14 @@ public class Main extends SimpleApplication implements Runnable {
 
         flyCam.setDragToRotate(true);
         flyCam.setMoveSpeed(50);
-        cam.setLocation(new Vector3f(5f, 3f, 5f));
-        cam.lookAt(Vector3f.ZERO, new Vector3f(0f, 3f, -5f));
+        cam.lookAt(Vector3f.ZERO, new Vector3f(0f, 20f, -25f));
     }
-    //Here is a comment
 
     @Override
     public void simpleUpdate(float tpf) {
         if (startScreen.snapshot == true || startScreen.startgame == true) {
 
             if (startScreen.startgame == true) {
-                //rootNode.detachAllChildren();
                 Environment.create();
                 rootNode.attachChild(SkyFactory.createSky(assetManager, "sky/redsky.jpg", true));
                 if (startScreen.snapshot == true) {
@@ -194,82 +194,86 @@ public class Main extends SimpleApplication implements Runnable {
                 initTimer();
                 initScore();
             } else if (startScreen.snapshot == true) {
-                try {
-                    double start_time = System.currentTimeMillis();
-                    rootNode.detachAllChildren();
-                    //RANSAC and Clustering Stuff
-                    float[][] kinectPointCloud = getData();
+                while (mode) {
+                    try {
+                        if (frameCount == 1) {
+                            startScreen.init(null, null, null);
+                            rootNode.detachAllChildren();
+                            //RANSAC and Clustering Stuff
+                            kinectPointCloud = getData();
 
-                    //do RANSAC -----------------------------------------------
-                    float noiseFactor = 50f; // noise of inliers
-                    int numberOfIterations = 10;
-                    float[] floor = RANSAC.detectPlane(kinectPointCloud, noiseFactor, numberOfIterations, (int) (kinectPointCloud.length * 0.8f));
-                    //remove floor and use flooding algorithm on remaining points to get objects
-
-                    // visualize result
-                    Cluster cluster = new Cluster(kinectPointCloud);
-                    float[][][] clusters;
-                    clusters = cluster.clustering();
-
-
-                    //boxes = new Box[(int) cluster.clust_flag];
-
-                    interBoxes = new InteractiveObject[(int) cluster.clust_flag];
-
-                    //Environment.create(clusters);
-
-                   // boxes = new Box[(int) cluster.clust_flag];
-
-                    for (int t = 0; t < cluster.clust_flag; t++) {
-                        Vector3f center = new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
-                        Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 100f),
-                                ((clusters[t][3][3] - clusters[t][2][3]) / 100f),
-                                ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
-                        interBoxes[t] = new TestBox(center, size);
-                        System.out.println("center " + t + ": (" + center.x + ", " + center.y + ", " + center.z + ")");
-                        System.out.println("Adding Box: " + t);
+                            //do RANSAC -----------------------------------------------
+                            float noiseFactor = 50f; // noise of inliers
+                            int numberOfIterations = 10;
+                            float[] floor = RANSAC.detectPlane(kinectPointCloud, noiseFactor, numberOfIterations, (int) (kinectPointCloud.length * 0.8f));
+                            //remove floor and use flooding algorithm on remaining points to get objects
+                            startScreen.setProgress(0.3f, "Found Floor");
+                        } else if (frameCount == 2) {
+                            cluster = new Cluster(kinectPointCloud);
+                            clusters = cluster.clustering();
+                            startScreen.setProgress(0.7f, "Found Objects");
+                        } else if (frameCount == 3) {
+                            interBoxes = new InteractiveObject[(int) cluster.clust_flag];
+                            for (int t = 0; t < cluster.clust_flag; t++) {
+                                //7 is the floor extent
+                                Vector3f center = new Vector3f((clusters[t][0][3] / 10f) % 7 + 5, (clusters[t][2][3] / 10f), (clusters[t][4][3] / 10000f) % 7 + 12);
+                                Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
+                                        ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
+                                        ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
+                                interBoxes[t] = new TestBox(center, size);
+                                System.out.println("center " + t + ": (" + center.x + ", " + center.y + ", " + center.z + ")");
+                                System.out.println("Adding Box: " + t);
+                            }
+                            startScreen.startgame = true;
+                            startScreen.setProgress(0.9f, "Environment Created");
+                        } else if (frameCount == 4) {
+                            mode = false;
+                            startScreen.setProgress(1f, "Ready to Play");
+                        }
+                        frameCount++;
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    //startScreen.snapshot = false;
-                    startScreen.startgame = true;
-                    double end_time = System.currentTimeMillis();
-                    mode = false;
-                    System.out.println("time it takes to take picture:" + (end_time - start_time));
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            startScreen.setsnapcomplete();
             }
         }
         kinectskeleton.updateMovements();
-        //spawnBox(tpf);
         if (mode == true) {
             spawnBox(tpf);
             countUp = false;
-        }else{
+        } else {
             countUp = true;
-            if(allObjectsDestroyed()){
+            if (allObjectsDestroyed()) {
                 timesUp = true;
             }
         }
         if (startScreen.quitgame == true) {
             windowFrame.repaint();
-
         }
-
     }
 
-    public void makeGUI(int score, int time) {
+    public void makeGUI(int score, long time) {
         /* LeaderBoard GUI */
-        LeaderBoard lb = new LeaderBoard(300, 300, score, time);
-        windowFrame = new JFrame();
-        windowFrame.setLayout(new BorderLayout());
-        windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //JPanel set = new JPanel();
-        windowFrame.add(lb);
-        windowFrame.pack();
-        windowFrame.setVisible(true);
+        if (!countUp) {
+            time = timeLimit / 1000;
+            LeaderBoard lb = new LeaderBoard(300, 300, score, time);
+            windowFrame = new JFrame();
+            windowFrame.setLayout(new BorderLayout());
+            windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            windowFrame.add(lb);
+            windowFrame.pack();
+            windowFrame.setVisible(true);
+        } else {
+            LeaderBoardClassic lbc = new LeaderBoardClassic(300, 300, score, time);
+            windowFrame = new JFrame();
+            windowFrame.setLayout(new BorderLayout());
+            windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            windowFrame.add(lbc);
+            windowFrame.pack();
+            windowFrame.setVisible(true);
+        }
     }
 
     // Point Geometry ---------------------------------------------
@@ -309,7 +313,6 @@ public class Main extends SimpleApplication implements Runnable {
     private void physicsInit() {
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
-        //bulletAppState.getPhysicsSpace().enableDebug(assetManager);
         bulletAppState.getPhysicsSpace().setAccuracy(1f / 60f);
     }
 
@@ -340,9 +343,9 @@ public class Main extends SimpleApplication implements Runnable {
         guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
         Time = new BitmapText(guiFont, false);
         Time.setSize(guiFont.getCharSet().getRenderedSize() + 5);
-        if(countUp){
+        if (countUp) {
             Time.setText("Time: " + formatTime(0));
-        }else{
+        } else {
             Time.setText("Time: " + formatTime(timeLimit));
         }
         Time.setLocalTranslation(250, 480, 0);
@@ -355,30 +358,29 @@ public class Main extends SimpleApplication implements Runnable {
 
     private void updateTimer() {
         if (started) {
-            
-            long tmp;
-            if(countUp){
-                tmp =  System.currentTimeMillis() - startTime;
-            }else{
+
+            if (countUp) {
+                tmp = System.currentTimeMillis() - startTime;
+            } else {
                 tmp = startTime + timeLimit - System.currentTimeMillis();
             }
-            
+
             if (tmp >= 0) {
                 Time.setText("Time: " + formatTime(tmp));
             } else {
                 timesUp = true;
                 Time.setText("Time: 0.00");
             }
-            
-            if(countUp){
+
+            if (countUp) {
                 if (tmp < 10000) {
                     Time.setColor(ColorRGBA.Green);
-                }else if(tmp>=10000 && tmp<120*1000){
+                } else if (tmp >= 10000 && tmp < 120 * 1000) {
                     Time.setColor(ColorRGBA.White);
-                }else if(tmp>120*1000){
+                } else if (tmp > 120 * 1000) {
                     Time.setColor(ColorRGBA.Red);
                 }
-            }else{
+            } else {
                 if (tmp > 9900 && tmp < 10000) {
                     Time.setColor(ColorRGBA.Red);
                 }
@@ -415,7 +417,7 @@ public class Main extends SimpleApplication implements Runnable {
 
             updateTimer();
             if (timesUp) {
-                makeGUI(score, 2);
+                makeGUI(score, tmp);
                 startScreen.quitGame();
                 run = false;
             }
@@ -428,18 +430,17 @@ public class Main extends SimpleApplication implements Runnable {
             }
         }
     }
-    
-    private boolean allObjectsDestroyed(){
-        if(interBoxes!=null){
-            for(int i =0;i < interBoxes.length; i++){
-                if(!interBoxes[i].removeSelf){
+
+    private boolean allObjectsDestroyed() {
+        if (interBoxes != null) {
+            for (int i = 0; i < interBoxes.length; i++) {
+                if (!interBoxes[i].removeSelf) {
                     return false;
                 }
             }
             return true;
-        }else{
+        } else {
             return false;
         }
     }
-    
 }

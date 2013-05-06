@@ -52,7 +52,7 @@ public class InteractiveObject implements PhysicsCollisionListener, PhysicsTickL
 
         //initialize box
         mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.White); // purple
+        mat.setColor("Color", ColorRGBA.Green); // purple
 
         geom.setMaterial(mat);
         geom.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);

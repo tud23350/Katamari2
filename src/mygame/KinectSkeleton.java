@@ -17,37 +17,32 @@ import kinecttcpclient.KinectTCPClient;
  * @author Michael
  */
 //This is where the skeleton should be created
-
 public class KinectSkeleton {
 
     Main main;
-    
     boolean madeSkeleton = false;
     Node skeleton = new Node(); // this is the skeleton, which connects to the root node.
     Node[] bones = new Node[13]; //13 is the number of cylinders we will have representing bones
     Vector3f boneTranslation[] = new Vector3f[13];
     KinematicObject[] boneObject = new KinematicObject[13];
-    int [][] joint;
-
+    int[][] joint;
     private final float scaleFactor = 500f;
-    
-    private int[][] getJoints(){
-        int [][]tmp;
+
+    private int[][] getJoints() {
+        int[][] tmp;
         if (main.kinect != null) {
             int[] skRaw = main.kinect.readSkeleton();
             tmp = KinectTCPClient.getJointPositions(skRaw, 1);
-        }else{
+        } else {
             tmp = main.moCap.getJoints();
         }
         return tmp;
     }
-    
+
     public void createSkeleton() {
-        
+
         joint = getJoints();
-        if(joint!=null){
-            Material matW = new Material(main.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-            matW.setColor("Color", ColorRGBA.White);
+        if (joint != null) {
             //starting joints
             float[][] StartingJoint = {{(float) joint[10][1] / scaleFactor, (float) joint[10][2] / scaleFactor, (float) joint[10][3] / scaleFactor}, //right wrist
                 {(float) joint[9][1] / scaleFactor, (float) joint[9][2] / scaleFactor, (float) joint[9][3] / scaleFactor}, //right elbow
@@ -79,22 +74,19 @@ public class KinectSkeleton {
             //start loop to connect all joints
             for (int i = 0; i < bones.length; i++) {
                 Cylinder c = new Cylinder(10, 10, 0.09f, 1f, true);
-                //new KinematicCylinder(new Geometry("Cylinder", c), Vector3f.ZERO);
-                //KinematicCylinder ko = new KinematicCylinder(c, Vector3f.ZERO);
                 boneObject[i] = new KinematicObject(new Geometry("Cylinder", c), Vector3f.ZERO);
                 //set geometry, connect and transform cylinder, set material
-                bones[i] = boneObject[i].selfNode;//new Geometry("Cylinder", c);
+                bones[i] = boneObject[i].selfNode;
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
                 float heightScale = bones[i].getLocalScale().z;
 
-                boneObject[i].setShape(new Geometry("New Shape",new Cylinder(10, 10, 0.09f, 1f*heightScale, true)));
+                boneObject[i].setShape(new Geometry("New Shape", new Cylinder(10, 10, 0.09f, 1f * heightScale, true)));
                 skeleton.attachChild(bones[i]);
                 main.getRootNode().attachChild(skeleton);
             }
-            
-            madeSkeleton = true;
-        }else{
 
+            madeSkeleton = true;
+        } else {
         }
 
     }
@@ -135,10 +127,10 @@ public class KinectSkeleton {
                 {(float) joint[17][1] / scaleFactor, (float) joint[17][2] / scaleFactor, (float) joint[17][3] / scaleFactor}, //right knee
                 {(float) joint[14][1] / scaleFactor, (float) joint[14][2] / scaleFactor, (float) joint[14][3] / scaleFactor}, //left ankle
                 {(float) joint[18][1] / scaleFactor, (float) joint[18][2] / scaleFactor, (float) joint[18][3] / scaleFactor}}; //right ankle
-            
-            for (int i = 0; i <bones.length; i++) {
+
+            for (int i = 0; i < bones.length; i++) {
                 setConnectiveTransform(ConnectingJoint[i], StartingJoint[i], bones[i]);
-                bones[i] = boneObject[i].selfNode;                
+                bones[i] = boneObject[i].selfNode;
             }
         } else {
             createSkeleton();
@@ -158,18 +150,17 @@ public class KinectSkeleton {
         bone.setLocalRotation(m);
         //Set Scaling
         bone.setLocalScale(1, 1, length);
-        
+
         float[] center = {(p1[0] + p2[0]) / 2f, (p1[1] + p2[1]) / 2f, (p1[2] + p2[2]) / 2f};
         bone.setLocalTranslation(center[0], center[1], center[2]);
 
         List<Spatial> l = bone.getChildren();
         ListIterator<Spatial> i = l.listIterator();
-        
-        while(i.hasNext()){
+
+        while (i.hasNext()) {
             Spatial s = i.next();
-            if(s.getName().equals("stuck")){
-                s.setLocalScale(1, 1, (float) 1./length);
-                //s.setLocalTranslation(0,0,0);
+            if (s.getName().equals("stuck")) {
+                s.setLocalScale(1, 1, (float) 1. / length);
             }
         }
     }

@@ -1,3 +1,7 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package mygame;
 
 import java.awt.Color;
@@ -18,13 +22,13 @@ import javax.swing.JPanel;
  *
  * @author Jake
  */
-public class LeaderBoard extends JPanel {
+public class LeaderBoardClassic extends JPanel {
 
     int sizeX, sizeY, score;
     long time;
     String[][] rank = new String[3][3];
 
-    public LeaderBoard(int sx, int sy, int score, long time) {
+    public LeaderBoardClassic(int sx, int sy, int score, long time) {
         super();
         sizeX = sx;
         sizeY = sy;
@@ -49,12 +53,12 @@ public class LeaderBoard extends JPanel {
 
     public void putScores() throws FileNotFoundException, IOException {
         getScores();
-        File data = new File("Kinect_Data/LeaderBoard.txt");
+        File data = new File("Kinect_Data/LeaderBoardClassic.txt");
         PrintWriter output = new PrintWriter(data);
         int place = rank.length;
         for (int i = 0; i < place; i++) {
             String name = "";
-            if (score >= Integer.parseInt(rank[i][1])) {
+            if (time >= Integer.parseInt(rank[i][2])) {
                 name = JOptionPane.showInputDialog(null, "HighScore!!");
                 if (i == 0) {
                     for (int d = 0; d < rank[0].length; d++) {
@@ -82,15 +86,15 @@ public class LeaderBoard extends JPanel {
         try {
             putScores();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(LeaderBoard.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(mygame.LeaderBoard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(LeaderBoard.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(mygame.LeaderBoard.class.getName()).log(Level.SEVERE, null, ex);
         }
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getHeight(), getWidth());
         g.setColor(Color.WHITE);
         int spacing = 10;
-        char[] leader = {'L', 'E', 'A', 'D', 'E', 'R', 'B', 'O', 'A', 'R', 'D', ' ', 'H', 'E', 'C', 'T', 'I', 'C'};
+        char[] leader = {'L', 'E', 'A', 'D', 'E', 'R', 'B', 'O', 'A', 'R', 'D', ' ', 'C', 'L', 'A', 'S', 'S', 'I', 'C'};
         g.drawChars(leader, 0, leader.length, (int) (0.2 * getWidth()), spacing);
         char[] score = {'s', 'c', 'o', 'r', 'e', ':'};
         char[] time = {'t', 'i', 'm', 'e', ':'};
@@ -101,5 +105,6 @@ public class LeaderBoard extends JPanel {
             g.drawChars(time, 0, time.length, 15, spacing + 20);
             g.drawChars(rank[j][2].toCharArray(), 0, rank[j][2].toCharArray().length, 18 + time.length * time.length, spacing += 20);
         }
+        System.out.println("LeaderBoard");
     }
 }
