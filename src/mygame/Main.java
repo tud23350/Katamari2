@@ -234,6 +234,7 @@ public class Main extends SimpleApplication implements Runnable {
                 } catch (IOException ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            startScreen.setsnapcomplete();
             }
         }
         kinectskeleton.updateMovements();

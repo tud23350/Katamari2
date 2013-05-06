@@ -24,7 +24,7 @@
     </layer>
     <layer id="foreground" childLayout="vertical">
       <panel id="panel_top" height="25%" width="75%" align="center" childLayout="center">  
-        <text text=" " font="Interface/Fonts/Default.fnt" width="100%" height="100%" />
+        <control name="label" id="status" color="#000" text="   " width="100%" height="100%" />
       </panel>
       <panel id="panel_mid" height="50%" width="75%" align="center" childLayout="center">       
         <text text=" " 

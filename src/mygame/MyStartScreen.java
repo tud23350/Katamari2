@@ -19,9 +19,10 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     private Screen screen;
     boolean snapshot = false;
     boolean startgame = false;
-    boolean snapshottext=false;
+    boolean snapshotcompleted=false;
     boolean loadingGame = false;
     boolean quitgame = false;
+    private boolean gamestarted=false;
 
     /**
      * custom 
@@ -35,6 +36,8 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     public void startGame(String nextScreen) {
         nifty.gotoScreen(nextScreen);  // switch to another screen
         startgame=true;
+        gamestarted=true;
+        
     }
     
     public void loading() {
@@ -44,7 +47,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
 
     public void snapshot() {
         snapshot=true;
-        snapshottext=true;
+        
         //loadingGame=true;
     }
 
@@ -57,13 +60,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
         return System.getProperty("user.name");
     }
 
-    public String getGameStatus() {
-        if (snapshottext == true) {
-            return "Snapshot Taken Sucessfully!";
-        } else {
-            return "hello ";
-        }
-    }
+
 
     /**
      * Nifty GUI ScreenControl methods
@@ -71,6 +68,10 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     public void bind(Nifty nifty, Screen screen) {
         this.nifty = nifty;
         this.screen = screen;
+    }
+    
+    public void setsnapcomplete(){
+        snapshotcompleted=true;
     }
 
     /**
@@ -83,12 +84,12 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
 
     @Override
     public void update(float tpf) {
-        /*
-        if (snapshottext) {
+        
+        if (snapshotcompleted && !gamestarted) {
             Element niftyElement = nifty.getCurrentScreen().findElementByName("panel_top");
-            niftyElement.getRenderer(TextRenderer.class).setText("Snapshot Taken");
+            niftyElement.getRenderer(TextRenderer.class).setText("Environment Created!");
         }
-        */
+        
     }
 
     public void onStartScreen() {
