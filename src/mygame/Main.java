@@ -149,9 +149,9 @@ public class Main extends SimpleApplication implements Runnable {
         initLighting();
         physicsInit();
         
-        //////////////////////////////////Added audio and sky back in
+        //////////////////////////////////Added audio back in
         initAudio();
-        rootNode.attachChild(SkyFactory.createSky(assetManager, "sky/redsky.jpg", true));
+        
         //////////////////////////////////////////////////////////////
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
@@ -184,6 +184,7 @@ public class Main extends SimpleApplication implements Runnable {
             if (startScreen.startgame == true) {
                 //rootNode.detachAllChildren();
                 Environment.create();
+                rootNode.attachChild(SkyFactory.createSky(assetManager, "sky/redsky.jpg", true));
                 if (startScreen.snapshot == true) {
                     kinectskeleton = new KinectSkeleton(this);
                     startScreen.snapshot = false;
