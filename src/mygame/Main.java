@@ -148,7 +148,7 @@ public class Main extends SimpleApplication implements Runnable {
 
         initLighting();
         physicsInit();
-        initAudio();
+        //initAudio();
         KinematicObject.addListener(this);
         KinematicCylinder.addListener(this);
         InteractiveObject.addListener(this);

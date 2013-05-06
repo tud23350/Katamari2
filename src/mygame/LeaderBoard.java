@@ -40,9 +40,6 @@ public class LeaderBoard extends JPanel {
             rank[k][0] = fileInput.nextLine(); //name
             rank[k][1] = fileInput.nextLine(); //score
             rank[k][2] = fileInput.nextLine(); //time
-            System.out.println(rank[k][0]);
-            System.out.print(rank[k][1]);
-            System.out.println(rank[k][2]);
             k++;
         }
         fileInput.close();
@@ -53,37 +50,55 @@ public class LeaderBoard extends JPanel {
         getScores();
         File data = new File("Kinect_Data/LeaderBoard.txt");
         PrintWriter output = new PrintWriter(data);
-        for (int i = 0; i < rank.length; i++) {
-            if (score > Integer.valueOf(rank[i][1])) {
-                rank[i][0] = "JEN";
+        int place = rank.length;
+        for (int i = 0; i < place; i++) {
+            String name = "";
+            if (score >= Integer.parseInt(rank[i][1])) {
+                name = JOptionPane.showInputDialog(null, "HighScore!!");
+                if (i == 0) {
+                    for (int d = 0; d < rank[0].length; d++) {
+                        rank[i + 2][d] = rank[i + 1][d];
+                        rank[i + 1][d] = rank[i][d];
+                    }
+                } else if (i == 1) {
+                    for (int d = 0; d < rank[0].length; d++) {
+                        rank[i + 1][d] = rank[i][d];
+                    }
+                }
+                rank[i][0] = name;
                 rank[i][1] = Integer.toString(score);
                 rank[i][2] = Integer.toString(time);
+                score = (int) Double.NEGATIVE_INFINITY;
             }
             output.println(rank[i][0]); //name
             output.println(rank[i][1]); //Score
             output.println(rank[i][2]); //Time
-            output.close();
         }
+        output.close();
     }
 
     public void paintComponent(Graphics g) {
         try {
-            getScores();
+            putScores();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(LeaderBoard.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(LeaderBoard.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //JOptionPane jp = new JOptionPane();
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, getHeight(), getWidth());
         g.setColor(Color.WHITE);
-        char[] leader = {'l','e','a','d','e','r',' ','b','o','a','r','d'};
-        g.drawChars(leader, 0, leader.length, (int)(0.2*getWidth()), (int)(0.5*getHeight()));
+        int spacing = 10;
+        char[] leader = {'L', 'E', 'A', 'D', 'E', 'R', 'B', 'O', 'A', 'R', 'D'};
+        g.drawChars(leader, 0, leader.length, (int) (0.2 * getWidth()), spacing);
+        char[] score = {'s', 'c', 'o', 'r', 'e', ':'};
+        char[] time = {'t', 'i', 'm', 'e', ':'};
         for (int j = 0; j < rank.length; j++) {
-            g.drawChars(rank[j][0].toCharArray(), 0, rank[j][0].toCharArray().length, (j+1)*(int)(0.2*getHeight()), (j+1)*(int)(0.5*getWidth()));
-            g.drawChars(rank[j][1].toCharArray(), 0, rank[j][1].toCharArray().length, (j+1)*(int)(0.2*getHeight())+10, (j+1)*(int)(0.5*getWidth())+10);
-            g.drawChars(rank[j][2].toCharArray(), 0, rank[j][2].toCharArray().length, (j+1)*(int)(0.2*getHeight())+10, (j+1)*(int)(0.5*getWidth())+10);
+            g.drawChars(rank[j][0].toCharArray(), 0, rank[j][0].toCharArray().length, 5, spacing += 20);
+            g.drawChars(score, 0, score.length, 15, spacing + 20);
+            g.drawChars(rank[j][1].toCharArray(), 0, rank[j][1].toCharArray().length, 15 + score.length * score.length, spacing += 20);
+            g.drawChars(time, 0, time.length, 15, spacing + 20);
+            g.drawChars(rank[j][2].toCharArray(), 0, rank[j][2].toCharArray().length, 18 + time.length * time.length, spacing += 20);
         }
         System.out.println("LeaderBoard");
     }
