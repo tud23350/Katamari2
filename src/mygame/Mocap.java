@@ -27,7 +27,7 @@ import kinecttcpclient.KinectTCPClient;
 
 public class Mocap extends Thread implements ActionListener {
 
-    Mocap_Panel skp;
+//    Mocap_Panel skp;
 //    KinectTCPClient kinect;
     int[][] joints;
     protected int state;
@@ -38,45 +38,45 @@ public class Mocap extends Thread implements ActionListener {
 
     public Mocap() {
         // GUI
-        JFrame windowFrame;
-        skp = new Mocap_Panel(300, 300, this);
-        windowFrame = new JFrame();
-        windowFrame.setLayout(new BorderLayout());
-        windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel southPanel = new JPanel();
-        southPanel.setLayout(new GridLayout(1, 3));
-        JButton stop = new JButton("Stop");
-        stop.setActionCommand("stop");
-        stop.addActionListener(this);
-        southPanel.add(stop);
-        JButton play = new JButton("Play");
-        play.addActionListener(this);
-        play.setActionCommand("play");
-        southPanel.add(play);
-        JButton record = new JButton("Record");
-        record.addActionListener(this);
-        record.setActionCommand("record");
-        southPanel.add(record);
-        windowFrame.add(southPanel, "South");
-        windowFrame.add(skp, "Center");
+        //JFrame windowFrame;
+        //skp = new Mocap_Panel(300, 300, this);
+        //windowFrame = new JFrame();
+        //windowFrame.setLayout(new BorderLayout());
+        //windowFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //JPanel southPanel = new JPanel();
+        //southPanel.setLayout(new GridLayout(1, 3));
+        //JButton stop = new JButton("Stop");
+        //stop.setActionCommand("stop");
+        //stop.addActionListener(this);
+        //southPanel.add(stop);
+        //JButton play = new JButton("Play");
+        //play.addActionListener(this);
+        //play.setActionCommand("play");
+        //southPanel.add(play);
+        //JButton record = new JButton("Record");
+        //record.addActionListener(this);
+        //record.setActionCommand("record");
+        //southPanel.add(record);
+        //windowFrame.add(southPanel, "South");
+        //windowFrame.add(skp, "Center");
 
         //
         // Menu
-        JMenuBar menuBar = new JMenuBar();
-        // --- file
-        JMenu menuFile = new JMenu("File");
-        JMenuItem itemSave = new JMenuItem("Save");
-        JMenuItem itemLoad = new JMenuItem("Load");
-        itemSave.setActionCommand("itemSave");
-        itemSave.addActionListener(this);
-        menuFile.add(itemSave);
-        itemLoad.setActionCommand("itemLoad");
-        itemLoad.addActionListener(this);
-        menuFile.add(itemLoad);
-        menuBar.add(menuFile);
-        windowFrame.setJMenuBar(menuBar);
-        windowFrame.pack();
-        windowFrame.setVisible(true);
+//        JMenuBar menuBar = new JMenuBar();
+//        // --- file
+//        JMenu menuFile = new JMenu("File");
+//        JMenuItem itemSave = new JMenuItem("Save");
+//        JMenuItem itemLoad = new JMenuItem("Load");
+//        itemSave.setActionCommand("itemSave");
+//        itemSave.addActionListener(this);
+//        menuFile.add(itemSave);
+//        itemLoad.setActionCommand("itemLoad");
+//        itemLoad.addActionListener(this);
+//        menuFile.add(itemLoad);
+//        menuBar.add(menuFile);
+//        windowFrame.setJMenuBar(menuBar);
+//        windowFrame.pack();
+//        windowFrame.setVisible(true);
 
 //        //Kinect
 //        kinect = new KinectTCPClient();
@@ -123,7 +123,7 @@ public class Mocap extends Thread implements ActionListener {
                         frameCnt = 0;
                         joints = frameIterator.next();
                     }
-                    skp.repaint();
+                    //skp.repaint();
 
                     break;
                 case RECORD:
@@ -174,7 +174,7 @@ public class Mocap extends Thread implements ActionListener {
             load();
         }
 
-        skp.repaint();
+        //skp.repaint();
     }
 
     // -------------------------------------------------------------------------
