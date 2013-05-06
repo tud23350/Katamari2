@@ -62,8 +62,11 @@ public class Cluster {
         }
 
         float[][][] clusters = new float[(int) clust_flag][outliers.length][outliers[0].length];
+        float[][][] temp = new float[(int) clust_flag][outliers.length][outliers[0].length];
+        int counter2 = 0, c_place = 0, cluster_limit = 100;
         for (int i = 0; i < clust_flag; i++) {
             k = 0;
+            counter2 = 0;
             for (float[] a : outliers) {
                 if (a[3] == i) {
                     clusters[i][k][0] = a[0];
@@ -71,6 +74,14 @@ public class Cluster {
                     clusters[i][k][2] = a[2];
                     k++;
                 }
+            }
+            if(counter2 > cluster_limit){
+                for(int p = 0; p < k; p++){
+                    clusters[c_place][p][0] = temp[i][p][0];
+                    clusters[c_place][p][1] = temp[i][p][1];
+                    clusters[c_place][p][2] = temp[i][p][2];
+                }
+                c_place++;
             }
         }
 
@@ -101,7 +112,6 @@ public class Cluster {
                 if (point[2] > max_Z) {
                     max_Z = point[2];
                 }
-
             }
             clusters[k][0][3] = min_X;
             clusters[k][1][3] = max_X;

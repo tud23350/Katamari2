@@ -216,10 +216,10 @@ public class Main extends SimpleApplication implements Runnable {
                    // boxes = new Box[(int) cluster.clust_flag];
 
                     for (int t = 0; t < cluster.clust_flag; t++) {
-                        Vector3f center = new Vector3f(clusters[t][0][3] / 100f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
-                        Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 1000f),
-                                ((clusters[t][3][3] - clusters[t][2][3]) / 1000f),
-                                ((clusters[t][5][3] - clusters[t][4][3]) / 10000f));
+                        Vector3f center = new Vector3f(clusters[t][0][3] / 10f, clusters[t][2][3] / 10f, clusters[t][4][3] / 10000f);
+                        Vector3f size = new Vector3f(((clusters[t][1][3] - clusters[t][0][3]) / 100f),
+                                ((clusters[t][3][3] - clusters[t][2][3]) / 100f),
+                                ((clusters[t][5][3] - clusters[t][4][3]) / 30000f));
                         interBoxes[t] = new TestBox(center, size);
                         System.out.println("center " + t + ": (" + center.x + ", " + center.y + ", " + center.z + ")");
                         System.out.println("Adding Box: " + t);
